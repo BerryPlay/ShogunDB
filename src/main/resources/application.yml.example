@@ -1,0 +1,25 @@
+spring:
+  profiles:
+    active: developement
+security:
+  basic:
+    enabled: false
+---
+spring:
+  profiles: developement
+  jpa:
+    database: MYSQL
+    show-sql: false
+    generate-ddl: true
+  datasource:
+    url: jdbc:mysql://<mysql-server-address>/<database-name>
+    username: 
+    password: 
+---
+spring:
+  profiles: test
+  jpa:
+    show-sql: false
+    database: H2
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_ON_EXIT=FALSE
