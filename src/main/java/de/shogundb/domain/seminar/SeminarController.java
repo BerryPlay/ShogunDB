@@ -105,9 +105,9 @@ public class SeminarController {
      * Update an existing seminar und (un-)link all members and referents based on the given ids.
      *
      * @param seminarUpdateDTO a data transfer object with all necessary information
-     * @return A HTTP 201 CREATED if the seminar was updated successfully
-     * @throws MemberNotFoundException thrown, if any of the given members are not in the database
-     * @throws PersonNotFoundException thrown, if any of the given persons are not in the database
+     * @return a HTTP 201 CREATED if the seminar was updated successfully
+     * @throws MemberNotFoundException  thrown, if any of the given members are not in the database
+     * @throws PersonNotFoundException  thrown, if any of the given persons are not in the database
      * @throws SeminarNotFoundException thrown, if the given seminar is not in the database
      */
     @PutMapping
@@ -162,5 +162,38 @@ public class SeminarController {
                 .buildAndExpand(updatedSeminar.getId()).toUri();
 
         return ResponseEntity.created(uri).body(updatedSeminar);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) throws SeminarNotFoundException {
+        Seminar seminar = seminarRepository.findById(id).orElseThrow(() -> new SeminarNotFoundException(id));
+
+        // remove the members from the seminar
+        seminar.getMembers().forEach(member -> member.getSeminars().remove(seminar));
+        seminar.getMembers().clear();
+
+        // remove the referents from the seminar
+        seminar.getReferents().forEach(referent -> referent.getSeminars().remove(seminar));
+        seminar.getReferents().clear();
+
+        // save changes to the database
+        seminarRepository.save(seminar);
+
+        // remove the seminar
+        seminarRepository.delete(seminar.getId());
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Get one seminar by id.
+     *
+     * @param id the unique identifier of the seminar
+     * @return a HTTP 200 OK and the seminar, if it exists in the database
+     * @throws SeminarNotFoundException thrown, if the seminar does not exist in the database
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Seminar> findById(@PathVariable Long id) throws SeminarNotFoundException {
+        return ResponseEntity.ok(seminarRepository.findById(id).orElseThrow(() -> new SeminarNotFoundException(id)));
     }
 }

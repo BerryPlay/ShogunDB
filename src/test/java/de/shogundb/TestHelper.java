@@ -5,6 +5,9 @@ import de.shogundb.domain.contributionClass.ContributionClass;
 import de.shogundb.domain.contributionClass.ContributionClassRepository;
 import de.shogundb.domain.member.Gender;
 import de.shogundb.domain.member.Member;
+import de.shogundb.domain.person.Person;
+import de.shogundb.domain.seminar.Seminar;
+import de.shogundb.domain.seminar.SeminarType;
 
 import java.util.Date;
 
@@ -57,6 +60,32 @@ public class TestHelper {
                                         .additionalContribution(5)
                                         .build()))
                 .accountHolder("Max Mustermann")
+                .build();
+    }
+
+    /**
+     * Creates a new person.
+     *
+     * @return a new person.
+     */
+    public static Person createTestPerson() {
+        return Person.builder()
+                .name("Test Person")
+                .build();
+    }
+
+    /**
+     * Creates a new seminar.
+     *
+     * @return a new seminar
+     */
+    public static Seminar createTestSeminar() {
+        return Seminar.builder()
+                .name("Test Seminar")
+                .place("Test Place")
+                .seminarType(SeminarType.NATIONAL)
+                .dateTo(new Date(1515283200000L))
+                .dateFrom(new Date(1515196800000L))
                 .build();
     }
 }

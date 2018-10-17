@@ -7,6 +7,7 @@ import de.shogundb.domain.discipline.DisciplineNotFoundException;
 import de.shogundb.domain.event.EventNotFoundException;
 import de.shogundb.domain.graduation.GraduationNotFoundException;
 import de.shogundb.domain.member.MemberNotFoundException;
+import de.shogundb.domain.seminar.SeminarNotFoundException;
 import de.shogundb.domain.user.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -58,5 +59,10 @@ public class ControllerAdviceConfig extends ResponseEntityExceptionHandler {
     @ExceptionHandler(SecurityException.class)
     public ResponseEntity<String> handleSecurityException(SecurityException e) {
         return ResponseEntity.status(409).body("Incorrect auth header present");
+    }
+
+    @ExceptionHandler(SeminarNotFoundException.class)
+    public ResponseEntity<?> handleSeminarNotFoundException(SeminarNotFoundException e) {
+        return ResponseEntity.notFound().build();
     }
 }

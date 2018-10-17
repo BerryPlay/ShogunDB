@@ -25,12 +25,13 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static de.shogundb.TestHelper.createTestPerson;
+import static de.shogundb.TestHelper.createTestSeminar;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -64,21 +65,9 @@ public class SeminarControllerTests {
 
     @Test
     public void all_seminars_can_be_called() throws Exception {
-        Seminar seminar1 = seminarRepository.save(Seminar.builder()
-                .name("Test Seminar")
-                .place("Test Place")
-                .seminarType(SeminarType.NATIONAL)
-                .dateTo(new Date(1515283200000L))
-                .dateFrom(new Date(1515196800000L))
-                .build());
+        Seminar seminar1 = seminarRepository.save(createTestSeminar());
 
-        Seminar seminar2 = seminarRepository.save(Seminar.builder()
-                .name("Another Test Seminar")
-                .place("Another Test Place")
-                .seminarType(SeminarType.NATIONAL)
-                .dateTo(new Date(1515283200000L))
-                .dateFrom(new Date(1515196800000L))
-                .build());
+        Seminar seminar2 = seminarRepository.save(createTestSeminar());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/seminar"))
                 .andExpect(status().isOk())
@@ -169,21 +158,11 @@ public class SeminarControllerTests {
         Member member3 = memberRepository.save(TestHelper.createTestMember(contributionClassRepository));
 
         // add two referents to the database
-        Person referent1 = personRepository.save(Person.builder()
-                .name("Test Person")
-                .build());
-        Person referent2 = personRepository.save(Person.builder()
-                .name("Another Test Person")
-                .build());
+        Person referent1 = personRepository.save(createTestPerson());
+        Person referent2 = personRepository.save(createTestPerson());
 
         // add a seminar to the database
-        Seminar seminar = Seminar.builder()
-                .name("Test Seminar")
-                .place("Test Place")
-                .seminarType(SeminarType.LOCAL)
-                .dateFrom(new Date(1515196800000L))
-                .dateTo(new Date(1515283200000L))
-                .build();
+        Seminar seminar = createTestSeminar();
 
         // link the members and the seminar
         seminar.getMembers().add(member1);
@@ -263,5 +242,68 @@ public class SeminarControllerTests {
          */
         assertFalse(updatedSeminar.getReferents().contains(updatedReferent1));
         assertTrue(updatedSeminar.getReferents().contains(updatedReferent2));
+    }
+
+    @Test
+    public void seminar_can_be_deleted() throws Exception {
+        // add three member to the database
+        Member member1 = memberRepository.save(TestHelper.createTestMember(contributionClassRepository));
+        Member member2 = memberRepository.save(TestHelper.createTestMember(contributionClassRepository));
+
+        // add two referents to the database
+        Person referent1 = personRepository.save(createTestPerson());
+
+        // create a seminar
+        Seminar seminar = createTestSeminar();
+
+        // link the members and the seminar
+        seminar.getMembers().add(member1);
+        seminar.getMembers().add(member2);
+        member1.getSeminars().add(seminar);
+        member2.getSeminars().add(seminar);
+
+        // line the referent to the seminar
+        seminar.getReferents().add(referent1);
+        referent1.getSeminars().add(seminar);
+
+        // save everything to the database
+        seminar = seminarRepository.save(seminar);
+
+        mockMvc.perform(delete("/seminar/" + seminar.getId().intValue()))
+                .andExpect(status().isNoContent());
+
+        // check, if the seminar was removed from the database
+        assertFalse(seminarRepository.findById(seminar.getId()).isPresent());
+
+        // update the previous entities
+        Member updatedMember1 = memberRepository.findOne(member1.getId());
+        Member updatedMember2 = memberRepository.findOne(member2.getId());
+        Person updatedReferent1 = personRepository.findOne(referent1.getId());
+
+        /*
+         * Test the links between the members/referents and the seminar
+         */
+        assertEquals(0, updatedMember1.getSeminars().size());
+        assertEquals(0, updatedMember2.getSeminars().size());
+        assertEquals(0, updatedReferent1.getSeminars().size());
+    }
+
+    @Test
+    public void seminar_can_be_called_by_id() throws Exception {
+        // add a seminar to the database
+        Seminar seminar = seminarRepository.save(createTestSeminar());
+
+        mockMvc.perform(get("/seminar/" + seminar.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(seminar.getId().intValue()))
+                .andExpect(jsonPath("$.name").value(seminar.getName()))
+                .andExpect(jsonPath("$.place").value(seminar.getPlace()))
+                .andExpect(jsonPath("$.dateFrom").value(seminar.getDateFrom().getTime()))
+                .andExpect(jsonPath("$.dateTo").value(seminar.getDateTo().getTime()))
+                .andExpect(jsonPath("$.seminarType").value(seminar.getSeminarType().toString()));
+
+        // destructive test with non existing id
+        mockMvc.perform(get("/seminar/-1"))
+                .andExpect(status().isNotFound());
     }
 }
