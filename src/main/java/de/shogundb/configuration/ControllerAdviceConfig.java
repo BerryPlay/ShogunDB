@@ -7,6 +7,7 @@ import de.shogundb.domain.discipline.DisciplineNotFoundException;
 import de.shogundb.domain.event.EventNotFoundException;
 import de.shogundb.domain.graduation.GraduationNotFoundException;
 import de.shogundb.domain.member.MemberNotFoundException;
+import de.shogundb.domain.person.PersonNotFoundException;
 import de.shogundb.domain.seminar.SeminarNotFoundException;
 import de.shogundb.domain.user.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -51,9 +52,9 @@ public class ControllerAdviceConfig extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(409).body("Member does not exist!");
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e) {
-        return ResponseEntity.status(409).body("User does not exist!");
+    @ExceptionHandler(PersonNotFoundException.class)
+    public ResponseEntity<?> handlePersonNotFoundException(PersonNotFoundException e) {
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(SecurityException.class)
@@ -64,5 +65,10 @@ public class ControllerAdviceConfig extends ResponseEntityExceptionHandler {
     @ExceptionHandler(SeminarNotFoundException.class)
     public ResponseEntity<?> handleSeminarNotFoundException(SeminarNotFoundException e) {
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e) {
+        return ResponseEntity.status(409).body("User does not exist!");
     }
 }
