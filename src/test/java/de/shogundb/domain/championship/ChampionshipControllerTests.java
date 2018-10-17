@@ -1,7 +1,6 @@
 package de.shogundb.domain.championship;
 
-import com.google.gson.*;
-import de.shogundb.domain.member.Gender;
+import de.shogundb.domain.contributionClass.ContributionClassRepository;
 import de.shogundb.domain.member.Member;
 import de.shogundb.domain.member.MemberNotFoundException;
 import de.shogundb.domain.member.MemberRepository;
@@ -11,12 +10,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -25,10 +21,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static de.shogundb.TestHelper.createTestMember;
+import static de.shogundb.TestHelper.toJson;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -46,34 +48,37 @@ public class ChampionshipControllerTests {
     private ChampionshipMemberRepository championshipMemberRepository;
 
     @Autowired
+    private ContributionClassRepository contributionClassRepository;
+
+    @Autowired
     private WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
 
     @Before
     public void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
     public void all_championships_can_be_called() throws Exception {
-        Championship championship = this.championshipRepository.save(Championship.builder()
+        Championship championship = championshipRepository.save(Championship.builder()
                 .name("Test Championship")
                 .date(new Date(1514764800000L))
                 .build());
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/championship"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", is(championship.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name", is(championship.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].date", is(championship.getDate().getTime())));
+        mockMvc.perform(get("/championship"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(is(championship.getId().intValue())))
+                .andExpect(jsonPath("$[0].name").value(is(championship.getName())))
+                .andExpect(jsonPath("$[0].date").value(is(championship.getDate().getTime())));
     }
 
     @Test
     public void championship_can_be_added() throws Exception {
-        Member member1 = this.memberRepository.save(this.createTestMember());
-        Member member2 = this.memberRepository.save(this.createTestMember());
+        Member member1 = memberRepository.save(createTestMember(contributionClassRepository));
+        Member member2 = memberRepository.save(createTestMember(contributionClassRepository));
 
         List<ChampionshipMemberRegisterDTO> members = new ArrayList<>();
         members.add(ChampionshipMemberRegisterDTO.builder()
@@ -91,35 +96,30 @@ public class ChampionshipControllerTests {
                 .members(members)
                 .build();
 
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> new Date(json.getAsJsonPrimitive().getAsLong()))
-                .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (date, type, jsonSerializationContext) -> new JsonPrimitive(date.getTime()))
-                .create();
+        mockMvc.perform(post("/championship")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(toJson(championshipRegisterDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(notNullValue()))
+                .andExpect(jsonPath("$.name").value(is(championshipRegisterDTO.getName())))
+                .andExpect(jsonPath("$.date").value(is(championshipRegisterDTO.getDate().getTime())));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/championship")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(gson.toJson(championshipRegisterDTO)))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", notNullValue()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", is(championshipRegisterDTO.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.date", is(championshipRegisterDTO.getDate().getTime())));
+        assertEquals(1L, championshipRepository.count());
 
-        assertEquals(1L, this.championshipRepository.count());
-
-        this.championshipRepository.findAll().forEach(
+        championshipRepository.findAll().forEach(
                 existing -> assertEquals(2, existing.getMembers().size()));
 
-        assertEquals(2L, this.championshipMemberRepository.count());
+        assertEquals(2L, championshipMemberRepository.count());
 
         List<Member> memberList = new ArrayList<>();
         memberList.add(member1);
         memberList.add(member2);
 
-        this.championshipMemberRepository.findAll().forEach(
+        championshipMemberRepository.findAll().forEach(
                 existing -> {
                     assertTrue(memberList.contains(existing.getMember()));
                     try {
-                        this.championshipRepository.findById(existing.getChampionship().getId()).orElseThrow(ChampionshipNotFoundException::new);
+                        championshipRepository.findById(existing.getChampionship().getId()).orElseThrow(ChampionshipNotFoundException::new);
                     } catch (ChampionshipNotFoundException e) {
                         fail();
                     }
@@ -128,10 +128,10 @@ public class ChampionshipControllerTests {
 
     @Test
     public void championship_can_be_updated() throws Exception {
-        Member member1 = this.memberRepository.save(this.createTestMember());
-        Member member2 = this.memberRepository.save(this.createTestMember());
+        Member member1 = memberRepository.save(createTestMember(contributionClassRepository));
+        Member member2 = memberRepository.save(createTestMember(contributionClassRepository));
 
-        Championship championship = this.championshipRepository.save(Championship.builder()
+        Championship championship = championshipRepository.save(Championship.builder()
                 .name("Test Championship")
                 .date(new Date(1514764800000L))
                 .build());
@@ -146,7 +146,7 @@ public class ChampionshipControllerTests {
         member1.getChampionships().add(championshipMember);
         championship.getMembers().add(championshipMember);
 
-        championship = this.championshipRepository.save(championship);
+        championship = championshipRepository.save(championship);
 
         ChampionshipMemberRegisterDTO championshipMemberRegisterDTO = ChampionshipMemberRegisterDTO.builder()
                 .memberId(member2.getId())
@@ -164,27 +164,22 @@ public class ChampionshipControllerTests {
                 .members(members)
                 .build();
 
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> new Date(json.getAsJsonPrimitive().getAsLong()))
-                .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (date, type, jsonSerializationContext) -> new JsonPrimitive(date.getTime()))
-                .create();
+        mockMvc.perform(put("/championship")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(toJson(championshipUpdateDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(notNullValue()))
+                .andExpect(jsonPath("$.name").value(is(championshipUpdateDTO.getName())))
+                .andExpect(jsonPath("$.date").value(is(championshipUpdateDTO.getDate().getTime())));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.put("/championship")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(gson.toJson(championshipUpdateDTO)))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", notNullValue()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", is(championshipUpdateDTO.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.date", is(championshipUpdateDTO.getDate().getTime())));
-
-        member1 = this.memberRepository.findById(member1.getId()).orElseThrow(MemberNotFoundException::new);
-        member2 = this.memberRepository.findById(member2.getId()).orElseThrow(MemberNotFoundException::new);
+        member1 = memberRepository.findById(member1.getId()).orElseThrow(MemberNotFoundException::new);
+        member2 = memberRepository.findById(member2.getId()).orElseThrow(MemberNotFoundException::new);
 
         assertTrue(member1.getChampionships().isEmpty());
         assertFalse(member2.getChampionships().isEmpty());
         assertEquals(member2, member2.getChampionships().get(0).getMember());
 
-        championship = this.championshipRepository.findById(championship.getId())
+        championship = championshipRepository.findById(championship.getId())
                 .orElseThrow(ChampionshipNotFoundException::new);
 
         assertEquals(1, championship.getMembers().size());
@@ -196,9 +191,9 @@ public class ChampionshipControllerTests {
 
     @Test
     public void championship_can_be_deleted() throws Exception {
-        Member member = this.memberRepository.save(this.createTestMember());
+        Member member = memberRepository.save(createTestMember(contributionClassRepository));
 
-        Championship championship = this.championshipRepository.save(Championship.builder()
+        Championship championship = championshipRepository.save(Championship.builder()
                 .name("Test Championship")
                 .date(new Date(1514764800000L))
                 .build());
@@ -213,57 +208,35 @@ public class ChampionshipControllerTests {
         member.getChampionships().add(championshipMember);
         championship.getMembers().add(championshipMember);
 
-        championship = this.championshipRepository.save(championship);
+        championship = championshipRepository.save(championship);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/championship/" + championship.getId()))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        mockMvc.perform(delete("/championship/" + championship.getId()))
+                .andExpect(status().isNoContent());
 
-        member = this.memberRepository.findById(member.getId()).orElseThrow(MemberNotFoundException::new);
+        member = memberRepository.findById(member.getId()).orElseThrow(MemberNotFoundException::new);
 
         assertTrue(member.getChampionships().isEmpty());
-        assertFalse(this.championshipRepository.findById(championship.getId()).isPresent());
-        assertEquals(0, this.championshipMemberRepository.count());
+        assertFalse(championshipRepository.findById(championship.getId()).isPresent());
+        assertEquals(0, championshipMemberRepository.count());
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/championship/-1"))
-                .andExpect(MockMvcResultMatchers.status().isConflict());
+        mockMvc.perform(delete("/championship/-1"))
+                .andExpect(status().isConflict());
     }
 
     @Test
     public void championship_can_be_called_by_id() throws Exception {
-        Championship championship = this.championshipRepository.save(Championship.builder()
+        Championship championship = championshipRepository.save(Championship.builder()
                 .name("Test Championship")
                 .date(new Date(1514764800000L))
                 .build());
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/championship/" + championship.getId()))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(championship.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", is(championship.getName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.date", is(championship.getDate().getTime())));
+        mockMvc.perform(get("/championship/" + championship.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(championship.getId().intValue())))
+                .andExpect(jsonPath("$.name", is(championship.getName())))
+                .andExpect(jsonPath("$.date", is(championship.getDate().getTime())));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/championship/-1"))
-                .andExpect(MockMvcResultMatchers.status().isConflict());
-    }
-
-    private Member createTestMember() {
-        return Member.builder()
-                .forename("Max")
-                .surname("Mustermann")
-                .gender(Gender.MALE)
-                .street("Musterstraße")
-                .postcode("26721")
-                .phoneNumber("04929 5435438")
-                .mobileNumber("1522 416845575")
-                .email("max@muster.de")
-                .dateOfBirth(new Date(810086400000L))
-                .hasBudoPass(true)
-                .budoPassDate(new Date(1514764800000L))
-                .enteredDate(new Date(1514764800000L))
-                .hasLeft(false)
-                .leftDate(null)
-                .isPassive(false)
-                .contributionClass(null)
-                .accountHolder("Max Mustermann")
-                .build();
+        mockMvc.perform(get("/championship/-1"))
+                .andExpect(status().isConflict());
     }
 }

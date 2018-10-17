@@ -1,9 +1,8 @@
 package de.shogundb.domain.seminar;
 
 import com.google.gson.*;
-import de.shogundb.domain.contributionClass.ContributionClass;
+import de.shogundb.TestHelper;
 import de.shogundb.domain.contributionClass.ContributionClassRepository;
-import de.shogundb.domain.member.Gender;
 import de.shogundb.domain.member.Member;
 import de.shogundb.domain.member.MemberNotFoundException;
 import de.shogundb.domain.member.MemberRepository;
@@ -15,12 +14,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -30,9 +27,7 @@ import java.util.Date;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -64,12 +59,12 @@ public class SeminarControllerTests {
 
     @Before
     public void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
     public void all_seminars_can_be_called() throws Exception {
-        Seminar seminar1 = this.seminarRepository.save(Seminar.builder()
+        Seminar seminar1 = seminarRepository.save(Seminar.builder()
                 .name("Test Seminar")
                 .place("Test Place")
                 .seminarType(SeminarType.NATIONAL)
@@ -77,7 +72,7 @@ public class SeminarControllerTests {
                 .dateFrom(new Date(1515196800000L))
                 .build());
 
-        Seminar seminar2 = this.seminarRepository.save(Seminar.builder()
+        Seminar seminar2 = seminarRepository.save(Seminar.builder()
                 .name("Another Test Seminar")
                 .place("Another Test Place")
                 .seminarType(SeminarType.NATIONAL)
@@ -87,12 +82,12 @@ public class SeminarControllerTests {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/seminar"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$").value(hasSize(2)))
 
                 // test values of seminar 1
-                .andExpect(jsonPath("$[0].id", is(seminar1.getId().intValue())))
-                .andExpect(jsonPath("$[0].name", is(seminar1.getName())))
-                .andExpect(jsonPath("$[0].place", is(seminar1.getPlace())))
+                .andExpect(jsonPath("$[0].id").value(is(seminar1.getId().intValue())))
+                .andExpect(jsonPath("$[0].name").value(is(seminar1.getName())))
+                .andExpect(jsonPath("$[0].place").value(is(seminar1.getPlace())))
                 .andExpect(jsonPath("$[0].seminarType",
                         is(seminar1.getSeminarType().toString())))
                 .andExpect(jsonPath("$[0].dateFrom",
@@ -101,9 +96,9 @@ public class SeminarControllerTests {
                         is(seminar1.getDateTo().getTime())))
 
                 // test values of seminar 2
-                .andExpect(jsonPath("$[1].id", is(seminar2.getId().intValue())))
-                .andExpect(jsonPath("$[1].name", is(seminar2.getName())))
-                .andExpect(jsonPath("$[1].place", is(seminar2.getPlace())))
+                .andExpect(jsonPath("$[1].id").value(is(seminar2.getId().intValue())))
+                .andExpect(jsonPath("$[1].name").value(is(seminar2.getName())))
+                .andExpect(jsonPath("$[1].place").value(is(seminar2.getPlace())))
                 .andExpect(jsonPath("$[1].seminarType",
                         is(seminar2.getSeminarType().toString())))
                 .andExpect(jsonPath("$[1].dateFrom",
@@ -114,8 +109,8 @@ public class SeminarControllerTests {
 
     @Test
     public void seminar_can_be_added() throws Exception {
-        Member member1 = memberRepository.save(createTestMember());
-        Member member2 = memberRepository.save(createTestMember());
+        Member member1 = memberRepository.save(TestHelper.createTestMember(contributionClassRepository));
+        Member member2 = memberRepository.save(TestHelper.createTestMember(contributionClassRepository));
         Person referent = personRepository.save(Person.builder()
                 .name("Test Person")
                 .build());
@@ -135,22 +130,15 @@ public class SeminarControllerTests {
                 }})
                 .build();
 
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context)
-                        -> new Date(json.getAsJsonPrimitive().getAsLong()))
-                .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (date, type, jsonSerializationContext)
-                        -> new JsonPrimitive(date.getTime()))
-                .create();
-
         mockMvc.perform(post("/seminar")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(gson.toJson(seminar)))
+                .content(TestHelper.toJson(seminar)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name", is(seminar.getName())))
-                .andExpect(jsonPath("$.place", is(seminar.getPlace())))
-                .andExpect(jsonPath("$.seminarType", is(seminar.getSeminarType().toString())))
-                .andExpect(jsonPath("$.dateFrom", is(seminar.getDateFrom().getTime())))
-                .andExpect(jsonPath("$.dateTo", is(seminar.getDateTo().getTime())));
+                .andExpect(jsonPath("$.name").value(is(seminar.getName())))
+                .andExpect(jsonPath("$.place").value(is(seminar.getPlace())))
+                .andExpect(jsonPath("$.seminarType").value(is(seminar.getSeminarType().toString())))
+                .andExpect(jsonPath("$.dateFrom").value(is(seminar.getDateFrom().getTime())))
+                .andExpect(jsonPath("$.dateTo").value(is(seminar.getDateTo().getTime())));
 
         // get the added seminar from the database
         Seminar newSeminar = seminarRepository.findAll().iterator().next();
@@ -176,9 +164,9 @@ public class SeminarControllerTests {
     @Test
     public void seminar_can_be_updated() throws Exception {
         // add three member to the database
-        Member member1 = memberRepository.save(createTestMember());
-        Member member2 = memberRepository.save(createTestMember());
-        Member member3 = memberRepository.save(createTestMember());
+        Member member1 = memberRepository.save(TestHelper.createTestMember(contributionClassRepository));
+        Member member2 = memberRepository.save(TestHelper.createTestMember(contributionClassRepository));
+        Member member3 = memberRepository.save(TestHelper.createTestMember(contributionClassRepository));
 
         // add two referents to the database
         Person referent1 = personRepository.save(Person.builder()
@@ -275,33 +263,5 @@ public class SeminarControllerTests {
          */
         assertFalse(updatedSeminar.getReferents().contains(updatedReferent1));
         assertTrue(updatedSeminar.getReferents().contains(updatedReferent2));
-    }
-
-    private Member createTestMember() {
-        return Member.builder()
-                .forename("Max")
-                .surname("Mustermann")
-                .gender(Gender.MALE)
-                .street("Musterstraße")
-                .postcode("26721")
-                .phoneNumber("04929 5435438")
-                .mobileNumber("1522 416845575")
-                .email("max@muster.de")
-                .dateOfBirth(new Date(810086400000L))
-                .hasBudoPass(true)
-                .budoPassDate(new Date(1514764800000L))
-                .enteredDate(new Date(1514764800000L))
-                .hasLeft(false)
-                .leftDate(null)
-                .isPassive(false)
-                .contributionClass(
-                        this.contributionClassRepository.save(
-                                ContributionClass.builder()
-                                        .name("Test")
-                                        .baseContribution(27.7)
-                                        .additionalContribution(5)
-                                        .build()))
-                .accountHolder("Max Mustermann")
-                .build();
     }
 }

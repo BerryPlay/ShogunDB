@@ -1,6 +1,6 @@
 package de.shogundb.domain.user;
 
-import com.google.gson.Gson;
+import de.shogundb.TestHelper;
 import de.shogundb.domain.token.Token;
 import de.shogundb.domain.token.TokenService;
 import org.junit.Before;
@@ -10,13 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -29,6 +26,8 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -41,9 +40,6 @@ public class UserControllerTests {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
     @Autowired
     private TokenService tokenService;
@@ -67,13 +63,13 @@ public class UserControllerTests {
                         .token(new ArrayList<>())
                         .build());
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/user"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", is(user.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].username", is(user.getUsername())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].email", is(user.getEmail())));
+        this.mockMvc.perform(get("/user"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$[0].username", is(user.getUsername())))
+                .andExpect(jsonPath("$[0].email", is(user.getEmail())));
 
         // insert another test user
         User user2 = userRepository.save(
@@ -84,13 +80,13 @@ public class UserControllerTests {
                         .token(new ArrayList<>())
                         .build());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/user"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(2)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", is(user2.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].username", is(user2.getUsername())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].email", is(user2.getEmail())));
+        mockMvc.perform(get("/user"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[1].id", is(user2.getId().intValue())))
+                .andExpect(jsonPath("$[1].username", is(user2.getUsername())))
+                .andExpect(jsonPath("$[1].email", is(user2.getEmail())));
     }
 
     @Test
@@ -105,12 +101,12 @@ public class UserControllerTests {
                         .build());
 
         // with existing user
-        mockMvc.perform(MockMvcRequestBuilders.head("/user/" + user.getId()))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(head("/user/" + user.getId()))
+                .andExpect(status().isOk());
 
         // with a non existing user
-        mockMvc.perform(MockMvcRequestBuilders.head("/user/-1"))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        mockMvc.perform(head("/user/-1"))
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -124,20 +120,18 @@ public class UserControllerTests {
                         .token(new ArrayList<>())
                         .build());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/user/" + user.getId()))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.username", is(user.getUsername())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email", is(user.getEmail())));
+        mockMvc.perform(get("/user/" + user.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username", is(user.getUsername())))
+                .andExpect(jsonPath("$.email", is(user.getEmail())));
 
         // test with a non existing user
-        mockMvc.perform(MockMvcRequestBuilders.get("/user/-1"))
-                .andExpect(MockMvcResultMatchers.status().isConflict());
+        mockMvc.perform(get("/user/-1"))
+                .andExpect(status().isConflict());
     }
 
     @Test
     public void user_can_be_added() throws Exception {
-        Gson gson = new Gson();
-
         // insert a test user
         User user = User.builder()
                 .username("testuser2")
@@ -145,23 +139,23 @@ public class UserControllerTests {
                 .email("test@email.com")
                 .build();
 
-        String userJsonString = gson.toJson(user);
+        String userJsonString = TestHelper.toJson(user);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.post("/user")
+                post("/user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJsonString))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.username", is(user.getUsername())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email", is(user.getEmail())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.username", is(user.getUsername())))
+                .andExpect(jsonPath("$.email", is(user.getEmail())))
                 .andReturn();
 
         // test, if validation works
         user.setPassword(null);
-        mockMvc.perform(MockMvcRequestBuilders.post("/user")
+        mockMvc.perform(post("/user")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(gson.toJson(user)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .content(TestHelper.toJson(user)))
+                .andExpect(status().isBadRequest());
     }
 
     public void user_can_be_updated() throws Exception {
@@ -176,16 +170,16 @@ public class UserControllerTests {
         user.setEmail("new.email@internet.com");
         user.setPassword("new_super_secure_password");
 
-        String userJsonString = new Gson().toJson(user);
+        String userJsonString = TestHelper.toJson(user);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.put("/user")
+                put("/user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJsonString))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(user.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.username", is(user.getUsername())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email", is(user.getEmail())));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+                .andExpect(jsonPath("$.username", is(user.getUsername())))
+                .andExpect(jsonPath("$.email", is(user.getEmail())));
 
         User updatedUser = this.userRepository.findById(user.getId())
                 .orElseThrow(UserNotFoundException::new);
@@ -199,9 +193,9 @@ public class UserControllerTests {
                 .build();
 
         newUser.setId(0L);
-        userJsonString = new Gson().toJson(newUser);
+        userJsonString = TestHelper.toJson(newUser);
         try {
-            mockMvc.perform(MockMvcRequestBuilders.put("/user")
+            mockMvc.perform(put("/user")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(userJsonString));
             fail();
@@ -223,9 +217,9 @@ public class UserControllerTests {
         // generate a authentication token
         Token token = this.tokenService.generate(user);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/user/" + user.getId())
+        mockMvc.perform(delete("/user/" + user.getId())
                 .header("Authorization", "Bearer " + token.getToken()))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(status().isNoContent());
 
         assertFalse(this.userRepository.findById(user.getId()).isPresent());
     }

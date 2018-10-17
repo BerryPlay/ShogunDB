@@ -1,6 +1,6 @@
 package de.shogundb.domain.member;
 
-import com.google.gson.*;
+import de.shogundb.TestHelper;
 import de.shogundb.domain.contributionClass.ContributionClass;
 import de.shogundb.domain.contributionClass.ContributionClassNotFoundException;
 import de.shogundb.domain.contributionClass.ContributionClassRepository;
@@ -16,12 +16,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -30,9 +27,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static de.shogundb.TestHelper.createTestMember;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -60,53 +61,53 @@ public class MemberControllerTests {
 
     @Before
     public void setup() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
     public void all_members_can_be_called() throws Exception {
         // insert a test member
-        Member member = this.memberRepository.save(this.createTestMember());
+        Member member = memberRepository.save(createTestMember(contributionClassRepository));
 
         System.out.println("Member as JSON: " + member.getDateOfBirth());
 
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/member"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].forename", is(member.getForename())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].surname", is(member.getSurname())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].gender", is(member.getGender().toString())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].street", is(member.getStreet())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].postcode", is(member.getPostcode())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].phoneNumber", is(member.getPhoneNumber())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].mobileNumber", is(member.getMobileNumber())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].email", is(member.getEmail())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].dateOfBirth", is(member.getDateOfBirth().getTime())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].hasBudoPass", is(member.getHasBudoPass())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].budoPassDate", is(member.getBudoPassDate().getTime())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].enteredDate", is(member.getEnteredDate().getTime())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].hasLeft", is(member.getHasLeft())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].leftDate", is(member.getLeftDate())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].isPassive", is(member.getIsPassive())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].accountHolder", is(member.getAccountHolder())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].disciplines", is(member.getDisciplines())));
+        mockMvc.perform(get("/member"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].forename").value(is(member.getForename())))
+                .andExpect(jsonPath("$[0].surname").value(is(member.getSurname())))
+                .andExpect(jsonPath("$[0].gender").value(is(member.getGender().toString())))
+                .andExpect(jsonPath("$[0].street").value(is(member.getStreet())))
+                .andExpect(jsonPath("$[0].postcode").value(is(member.getPostcode())))
+                .andExpect(jsonPath("$[0].phoneNumber").value(is(member.getPhoneNumber())))
+                .andExpect(jsonPath("$[0].mobileNumber").value(is(member.getMobileNumber())))
+                .andExpect(jsonPath("$[0].email").value(is(member.getEmail())))
+                .andExpect(jsonPath("$[0].dateOfBirth").value(is(member.getDateOfBirth().getTime())))
+                .andExpect(jsonPath("$[0].hasBudoPass").value(is(member.getHasBudoPass())))
+                .andExpect(jsonPath("$[0].budoPassDate").value(is(member.getBudoPassDate().getTime())))
+                .andExpect(jsonPath("$[0].enteredDate").value(is(member.getEnteredDate().getTime())))
+                .andExpect(jsonPath("$[0].hasLeft").value(is(member.getHasLeft())))
+                .andExpect(jsonPath("$[0].leftDate").value(is(member.getLeftDate())))
+                .andExpect(jsonPath("$[0].isPassive").value(is(member.getIsPassive())))
+                .andExpect(jsonPath("$[0].accountHolder").value(is(member.getAccountHolder())))
+                .andExpect(jsonPath("$[0].disciplines").value(is(member.getDisciplines())));
     }
 
     @Test
     public void member_can_be_added() throws Exception {
-        ContributionClass contributionClass = this.contributionClassRepository.save(
+        ContributionClass contributionClass = contributionClassRepository.save(
                 ContributionClass.builder()
                         .name("Test")
                         .baseContribution(27.7)
                         .additionalContribution(5)
                         .build());
 
-        Discipline discipline1 = this.disciplineRepository.save(Discipline.builder()
+        Discipline discipline1 = disciplineRepository.save(Discipline.builder()
                 .name("Test Discipline")
                 .build());
 
-        Discipline discipline2 = this.disciplineRepository.save(Discipline.builder()
+        Discipline discipline2 = disciplineRepository.save(Discipline.builder()
                 .name("Another Test Discipline")
                 .build());
 
@@ -136,47 +137,42 @@ public class MemberControllerTests {
                 .disciplines(disciplines)
                 .build();
 
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> new Date(json.getAsJsonPrimitive().getAsLong()))
-                .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (date, type, jsonSerializationContext) -> new JsonPrimitive(date.getTime()))
-                .create();
+        String memberJson = TestHelper.toJson(memberRegisterDTO);
 
-        String memberJson = gson.toJson(memberRegisterDTO);
-
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/member")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+        mockMvc.perform(post("/member")
+                .contentType(APPLICATION_JSON_UTF8)
                 .content(memberJson))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.forename", is(memberRegisterDTO.getForename())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.surname", is(memberRegisterDTO.getSurname())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.gender", is(memberRegisterDTO.getGender().toString())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.street", is(memberRegisterDTO.getStreet())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.postcode", is(memberRegisterDTO.getPostcode())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", is(memberRegisterDTO.getPhoneNumber())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.mobileNumber", is(memberRegisterDTO.getMobileNumber())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email", is(memberRegisterDTO.getEmail())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.dateOfBirth", is(memberRegisterDTO.getDateOfBirth().getTime())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.hasBudoPass", is(memberRegisterDTO.getHasBudoPass())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.budoPassDate", is(memberRegisterDTO.getBudoPassDate().getTime())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.enteredDate", is(memberRegisterDTO.getEnteredDate().getTime())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.hasLeft", is(memberRegisterDTO.getHasLeft())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.leftDate", is(memberRegisterDTO.getLeftDate())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.isPassive", is(memberRegisterDTO.getIsPassive())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.accountHolder", is(memberRegisterDTO.getAccountHolder())));
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.forename").value(is(memberRegisterDTO.getForename())))
+                .andExpect(jsonPath("$.surname").value(is(memberRegisterDTO.getSurname())))
+                .andExpect(jsonPath("$.gender").value(is(memberRegisterDTO.getGender().toString())))
+                .andExpect(jsonPath("$.street").value(is(memberRegisterDTO.getStreet())))
+                .andExpect(jsonPath("$.postcode").value(is(memberRegisterDTO.getPostcode())))
+                .andExpect(jsonPath("$.phoneNumber").value(is(memberRegisterDTO.getPhoneNumber())))
+                .andExpect(jsonPath("$.mobileNumber").value(is(memberRegisterDTO.getMobileNumber())))
+                .andExpect(jsonPath("$.email").value(is(memberRegisterDTO.getEmail())))
+                .andExpect(jsonPath("$.dateOfBirth").value(is(memberRegisterDTO.getDateOfBirth().getTime())))
+                .andExpect(jsonPath("$.hasBudoPass").value(is(memberRegisterDTO.getHasBudoPass())))
+                .andExpect(jsonPath("$.budoPassDate").value(is(memberRegisterDTO.getBudoPassDate().getTime())))
+                .andExpect(jsonPath("$.enteredDate").value(is(memberRegisterDTO.getEnteredDate().getTime())))
+                .andExpect(jsonPath("$.hasLeft").value(is(memberRegisterDTO.getHasLeft())))
+                .andExpect(jsonPath("$.leftDate").value(is(memberRegisterDTO.getLeftDate())))
+                .andExpect(jsonPath("$.isPassive").value(is(memberRegisterDTO.getIsPassive())))
+                .andExpect(jsonPath("$.accountHolder").value(is(memberRegisterDTO.getAccountHolder())));
 
-        final ContributionClass finalContributionClass = this.contributionClassRepository.findById(contributionClass.getId())
+        final ContributionClass finalContributionClass = contributionClassRepository.findById(contributionClass.getId())
                 .orElseThrow(ContributionClassNotFoundException::new);
 
-        final Discipline finalDiscipline1 = this.disciplineRepository.findById(discipline1.getId())
+        final Discipline finalDiscipline1 = disciplineRepository.findById(discipline1.getId())
                 .orElseThrow(DisciplineNotFoundException::new);
 
-        final Discipline finalDiscipline2 = this.disciplineRepository.findById(discipline2.getId())
+        final Discipline finalDiscipline2 = disciplineRepository.findById(discipline2.getId())
                 .orElseThrow(DisciplineNotFoundException::new);
 
-        assertEquals(1, this.memberRepository.count());
+        assertEquals(1, memberRepository.count());
 
-        this.memberRepository.findAll().forEach(
+        memberRepository.findAll().forEach(
                 existing -> {
                     // contribution class
                     assertEquals(finalContributionClass, existing.getContributionClass());
@@ -196,39 +192,39 @@ public class MemberControllerTests {
 
     @Test
     public void member_can_be_updated() throws Exception {
-        Member member = this.memberRepository.save(this.createTestMember());
+        Member member = memberRepository.save(createTestMember(contributionClassRepository));
 
         Long oldContributionClassId = member.getContributionClass().getId();
 
-        ContributionClass contributionClass = this.contributionClassRepository.save(ContributionClass.builder()
+        ContributionClass contributionClass = contributionClassRepository.save(ContributionClass.builder()
                 .name("Updated Contribution Class")
                 .baseContribution(10.5)
                 .additionalContribution(5)
                 .build());
 
-        Discipline discipline1 = this.disciplineRepository.save(Discipline.builder()
+        Discipline discipline1 = disciplineRepository.save(Discipline.builder()
                 .name("Test Discipline")
                 .build());
         member.getDisciplines().add(discipline1);
         discipline1.getMembers().add(member);
 
-        Discipline discipline2 = this.disciplineRepository.save(Discipline.builder()
+        Discipline discipline2 = disciplineRepository.save(Discipline.builder()
                 .name("Another Test Discipline")
                 .build());
 
-        Event event1 = this.eventRepository.save(Event.builder()
+        Event event1 = eventRepository.save(Event.builder()
                 .name("Test Event")
                 .date(new Date(1523318400000L))
                 .build());
         member.getEvents().add(event1);
         event1.getMembers().add(member);
 
-        Event event2 = this.eventRepository.save(Event.builder()
+        Event event2 = eventRepository.save(Event.builder()
                 .name("Another Test Event")
                 .date(new Date(1523318400000L))
                 .build());
 
-        member = this.memberRepository.save(member);
+        member = memberRepository.save(member);
 
         List<Long> disciplines = new ArrayList<>();
         List<Long> events = new ArrayList<>();
@@ -261,54 +257,51 @@ public class MemberControllerTests {
                 .accountHolder("Max Mustermann")
                 .build();
 
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> new Date(json.getAsJsonPrimitive().getAsLong()))
-                .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (date, type, jsonSerializationContext) -> new JsonPrimitive(date.getTime()))
-                .create();
+        String memberJson = TestHelper.toJson(updateMember);
 
-        String memberJson = gson.toJson(updateMember);
-
-        this.mockMvc.perform(MockMvcRequestBuilders.put("/member")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+        mockMvc.perform(put("/member")
+                .contentType(APPLICATION_JSON_UTF8)
                 .content(memberJson))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.forename", is(updateMember.getForename())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.surname", is(updateMember.getSurname())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.gender", is(updateMember.getGender().toString())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.street", is(updateMember.getStreet())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.postcode", is(updateMember.getPostcode())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber", is(updateMember.getPhoneNumber())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.mobileNumber", is(updateMember.getMobileNumber())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email", is(updateMember.getEmail())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.dateOfBirth", is(updateMember.getDateOfBirth().getTime())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.hasBudoPass", is(updateMember.getHasBudoPass())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.budoPassDate", is(updateMember.getBudoPassDate().getTime())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.enteredDate", is(updateMember.getEnteredDate().getTime())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.hasLeft", is(updateMember.getHasLeft())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.leftDate", is(updateMember.getLeftDate())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.isPassive", is(updateMember.getIsPassive())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.accountHolder", is(updateMember.getAccountHolder())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.disciplines", hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.disciplines[0].id", is(discipline2.getId().intValue())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.events", hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.events[0].id", is(event2.getId().intValue())));
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.forename").value(is(updateMember.getForename())))
+                .andExpect(jsonPath("$.surname").value(is(updateMember.getSurname())))
+                .andExpect(jsonPath("$.gender").value(is(updateMember.getGender().toString())))
+                .andExpect(jsonPath("$.street").value(is(updateMember.getStreet())))
+                .andExpect(jsonPath("$.postcode").value(is(updateMember.getPostcode())))
+                .andExpect(jsonPath("$.phoneNumber").value(is(updateMember.getPhoneNumber())))
+                .andExpect(jsonPath("$.mobileNumber").value(is(updateMember.getMobileNumber())))
+                .andExpect(jsonPath("$.email").value(is(updateMember.getEmail())))
+                .andExpect(jsonPath("$.dateOfBirth").value(is(updateMember.getDateOfBirth().getTime())))
+                .andExpect(jsonPath("$.hasBudoPass").value(is(updateMember.getHasBudoPass())))
+                .andExpect(jsonPath("$.budoPassDate").value(is(updateMember.getBudoPassDate().getTime())))
+                .andExpect(jsonPath("$.enteredDate").value(is(updateMember.getEnteredDate().getTime())))
+                .andExpect(jsonPath("$.hasLeft").value(is(updateMember.getHasLeft())))
+                .andExpect(jsonPath("$.leftDate").value(is(updateMember.getLeftDate())))
+                .andExpect(jsonPath("$.isPassive").value(is(updateMember.getIsPassive())))
+                .andExpect(jsonPath("$.accountHolder").value(is(updateMember.getAccountHolder())))
+                .andExpect(jsonPath("$.disciplines").value(hasSize(1)))
+                .andExpect(jsonPath("$.disciplines[0].id").value(is(discipline2.getId().intValue())))
+                .andExpect(jsonPath("$.events").value(hasSize(1)))
+                .andExpect(jsonPath("$.events[0].id").value(is(event2.getId().intValue())));
 
-        final Discipline finalDiscipline1 = this.disciplineRepository.findById(discipline1.getId()).orElseThrow(DisciplineNotFoundException::new);
-        final Discipline finalDiscipline2 = this.disciplineRepository.findById(discipline2.getId()).orElseThrow(DisciplineNotFoundException::new);
+        final Discipline finalDiscipline1
+                = disciplineRepository.findById(discipline1.getId()).orElseThrow(DisciplineNotFoundException::new);
+        final Discipline finalDiscipline2
+                = disciplineRepository.findById(discipline2.getId()).orElseThrow(DisciplineNotFoundException::new);
 
-        final Event finalEvent1 = this.eventRepository.findById(event1.getId()).orElseThrow(EventNotFoundException::new);
-        final Event finalEvent2 = this.eventRepository.findById(event2.getId()).orElseThrow(EventNotFoundException::new);
+        final Event finalEvent1 = eventRepository.findById(event1.getId()).orElseThrow(EventNotFoundException::new);
+        final Event finalEvent2 = eventRepository.findById(event2.getId()).orElseThrow(EventNotFoundException::new);
 
-        final ContributionClass finalContributionClass = this.contributionClassRepository
+        final ContributionClass finalContributionClass = contributionClassRepository
                 .findById(contributionClass.getId())
                 .orElseThrow(ContributionClassNotFoundException::new);
 
-        final ContributionClass finalOldContributionClass = this.contributionClassRepository
+        final ContributionClass finalOldContributionClass = contributionClassRepository
                 .findById(oldContributionClassId)
                 .orElseThrow(ContributionClassNotFoundException::new);
 
-        this.memberRepository.findAll().forEach(
+        memberRepository.findAll().forEach(
                 existing -> {
                     // contribution class
                     assertEquals(0, finalOldContributionClass.getMembers().size());
@@ -338,27 +331,27 @@ public class MemberControllerTests {
         memberJson = memberJson.replace("\"id\":" + member.getId().toString(), "\"id\":-1");
 
         // try with invalid information
-        mockMvc.perform(MockMvcRequestBuilders.put("/member")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+        mockMvc.perform(put("/member")
+                .contentType(APPLICATION_JSON_UTF8)
                 .content(memberJson))
-                .andExpect(MockMvcResultMatchers.status().isConflict());
+                .andExpect(status().isConflict());
     }
 
     @Test
     public void member_can_be_deleted() throws Exception {
-        Member member = this.memberRepository.save(this.createTestMember());
+        Member member = memberRepository.save(createTestMember(contributionClassRepository));
 
-        ContributionClass contributionClass = this.contributionClassRepository.save(ContributionClass.builder()
+        ContributionClass contributionClass = contributionClassRepository.save(ContributionClass.builder()
                 .name("Test Contribution Class")
                 .baseContribution(10.0)
                 .additionalContribution(5.0)
                 .build());
 
-        Discipline discipline = this.disciplineRepository.save(Discipline.builder()
+        Discipline discipline = disciplineRepository.save(Discipline.builder()
                 .name("Test Discipline")
                 .build());
 
-        Event event = this.eventRepository.save(Event.builder()
+        Event event = eventRepository.save(Event.builder()
                 .name("Test Event")
                 .date(new Date(1514764800000L))
                 .build());
@@ -371,98 +364,71 @@ public class MemberControllerTests {
         discipline.getMembers().add(member);
         event.getMembers().add(member);
 
-        member = this.memberRepository.save(member);
+        member = memberRepository.save(member);
 
         assertTrue(contributionClass.getMembers().contains(member));
         assertTrue(discipline.getMembers().contains(member));
         assertTrue(event.getMembers().contains(member));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.delete("/member/" + member.getId()))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        mockMvc.perform(delete("/member/" + member.getId()))
+                .andExpect(status().isNoContent());
 
         // check if the member still exists in the database
-        assertFalse(this.memberRepository.findById(member.getId()).isPresent());
+        assertFalse(memberRepository.findById(member.getId()).isPresent());
 
-        contributionClass = this.contributionClassRepository.findById(contributionClass.getId())
+        contributionClass = contributionClassRepository.findById(contributionClass.getId())
                 .orElseThrow(ContributionClassNotFoundException::new);
 
-        discipline = this.disciplineRepository.findById(discipline.getId())
+        discipline = disciplineRepository.findById(discipline.getId())
                 .orElseThrow(DisciplineNotFoundException::new);
 
-        event = this.eventRepository.findById(event.getId()).orElseThrow(EventNotFoundException::new);
+        event = eventRepository.findById(event.getId()).orElseThrow(EventNotFoundException::new);
 
-        assertEquals(0,contributionClass.getMembers().size());
-        assertEquals(0,discipline.getMembers().size());
-        assertEquals(0,event.getMembers().size());
+        assertEquals(0, contributionClass.getMembers().size());
+        assertEquals(0, discipline.getMembers().size());
+        assertEquals(0, event.getMembers().size());
 
         // check, if member is detached from contribution class, events and disciplines
-        this.disciplineRepository.findAll().forEach(existing -> assertEquals(0, existing.getMembers().size()));
-        this.eventRepository.findAll().forEach(existing -> assertEquals(0, existing.getMembers().size()));
-        this.contributionClassRepository.findAll().forEach(existing -> assertEquals(0, existing.getMembers().size()));
+        disciplineRepository.findAll().forEach(existing -> assertEquals(0, existing.getMembers().size()));
+        eventRepository.findAll().forEach(existing -> assertEquals(0, existing.getMembers().size()));
+        contributionClassRepository.findAll().forEach(existing ->
+                assertEquals(0, existing.getMembers().size()));
 
         // test with not existing member
-        mockMvc.perform(MockMvcRequestBuilders.delete("/member/0"))
-                .andExpect(MockMvcResultMatchers.status().isConflict());
+        mockMvc.perform(delete("/member/0"))
+                .andExpect(status().isConflict());
     }
 
     @Test
     public void members_can_be_found_by_full_name() throws Exception {
-        Member member = this.memberRepository.save(this.createTestMember());
+        Member member = memberRepository.save(createTestMember(contributionClassRepository));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/member/byName/Max Mu"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].forename", is(member.getForename())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].surname", is(member.getSurname())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].gender", is(member.getGender().toString())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].street", is(member.getStreet())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].postcode", is(member.getPostcode())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].phoneNumber", is(member.getPhoneNumber())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].mobileNumber", is(member.getMobileNumber())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].email", is(member.getEmail())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].dateOfBirth", is(member.getDateOfBirth().getTime())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].hasBudoPass", is(member.getHasBudoPass())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].budoPassDate", is(member.getBudoPassDate().getTime())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].enteredDate", is(member.getEnteredDate().getTime())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].hasLeft", is(member.getHasLeft())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].leftDate", is(member.getLeftDate())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].isPassive", is(member.getIsPassive())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].accountHolder", is(member.getAccountHolder())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].disciplines", is(member.getDisciplines())));
+        mockMvc.perform(get("/member/byName/Max Mu"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").value(hasSize(1)))
+                .andExpect(jsonPath("$[0].forename").value(is(member.getForename())))
+                .andExpect(jsonPath("$[0].surname").value(is(member.getSurname())))
+                .andExpect(jsonPath("$[0].gender").value(is(member.getGender().toString())))
+                .andExpect(jsonPath("$[0].street").value(is(member.getStreet())))
+                .andExpect(jsonPath("$[0].postcode").value(is(member.getPostcode())))
+                .andExpect(jsonPath("$[0].phoneNumber").value(is(member.getPhoneNumber())))
+                .andExpect(jsonPath("$[0].mobileNumber").value(is(member.getMobileNumber())))
+                .andExpect(jsonPath("$[0].email").value(is(member.getEmail())))
+                .andExpect(jsonPath("$[0].dateOfBirth").value(is(member.getDateOfBirth().getTime())))
+                .andExpect(jsonPath("$[0].hasBudoPass").value(is(member.getHasBudoPass())))
+                .andExpect(jsonPath("$[0].budoPassDate").value(is(member.getBudoPassDate().getTime())))
+                .andExpect(jsonPath("$[0].enteredDate").value(is(member.getEnteredDate().getTime())))
+                .andExpect(jsonPath("$[0].hasLeft").value(is(member.getHasLeft())))
+                .andExpect(jsonPath("$[0].leftDate").value(is(member.getLeftDate())))
+                .andExpect(jsonPath("$[0].isPassive").value(is(member.getIsPassive())))
+                .andExpect(jsonPath("$[0].accountHolder").value(is(member.getAccountHolder())))
+                .andExpect(jsonPath("$[0].disciplines").value(is(member.getDisciplines())));
 
         // with not existing users
-        mockMvc.perform(MockMvcRequestBuilders.get("/member/byName/Not Existing"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(0)));
-    }
-
-    private Member createTestMember() {
-        return Member.builder()
-                .forename("Max")
-                .surname("Mustermann")
-                .gender(Gender.MALE)
-                .street("Musterstraße")
-                .postcode("26721")
-                .phoneNumber("04929 5435438")
-                .mobileNumber("1522 416845575")
-                .email("max@muster.de")
-                .dateOfBirth(new Date(810086400000L))
-                .hasBudoPass(true)
-                .budoPassDate(new Date(1514764800000L))
-                .enteredDate(new Date(1514764800000L))
-                .hasLeft(false)
-                .leftDate(null)
-                .isPassive(false)
-                .contributionClass(
-                        this.contributionClassRepository.save(
-                                ContributionClass.builder()
-                                        .name("Test")
-                                        .baseContribution(27.7)
-                                        .additionalContribution(5)
-                                        .build()))
-                .accountHolder("Max Mustermann")
-                .build();
+        mockMvc.perform(get("/member/byName/Not Existing"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$").value(hasSize(0)));
     }
 }

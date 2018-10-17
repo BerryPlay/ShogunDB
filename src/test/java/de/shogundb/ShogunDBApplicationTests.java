@@ -18,6 +18,6 @@ public class ShogunDBApplicationTests {
 
     @Test
     public void context_loads() {
-        Assert.assertNotNull(this.applicationContext);
+        Assert.assertNotNull(applicationContext);
     }
 }

@@ -1,6 +1,6 @@
 package de.shogundb.domain.championship;
 
-import de.shogundb.domain.member.Gender;
+import de.shogundb.domain.contributionClass.ContributionClassRepository;
 import de.shogundb.domain.member.Member;
 import de.shogundb.domain.member.MemberNotFoundException;
 import de.shogundb.domain.member.MemberRepository;
@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
+import static de.shogundb.TestHelper.createTestMember;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -31,11 +32,14 @@ public class ChampionshipMemberTests {
     private ChampionshipMemberRepository championshipMemberRepository;
 
     @Autowired
+    private ContributionClassRepository contributionClassRepository;
+
+    @Autowired
     private MemberRepository memberRepository;
 
     @Test
     public void championship_member_tests() throws MemberNotFoundException {
-        Member member = this.memberRepository.save(this.createTestMember());
+        Member member = this.memberRepository.save(createTestMember(contributionClassRepository));
 
         Championship championship = this.championshipRepository.save(Championship.builder()
                 .name("Test Championship")
@@ -65,26 +69,5 @@ public class ChampionshipMemberTests {
         assertEquals(member, member.getChampionships().get(0).getChampionship().getMembers().get(0).getMember());
         assertEquals(championshipMember.getExtra(), member.getChampionships().get(0).getExtra());
         assertEquals(championshipMember.getExtra(), championship.getMembers().get(0).getExtra());
-    }
-
-    private Member createTestMember() {
-        return Member.builder()
-                .forename("Max")
-                .surname("Mustermann")
-                .gender(Gender.MALE)
-                .street("Musterstraße")
-                .postcode("26721")
-                .phoneNumber("04929 5435438")
-                .mobileNumber("1522 416845575")
-                .email("max@muster.de")
-                .dateOfBirth(new Date(810086400000L))
-                .hasBudoPass(true)
-                .budoPassDate(new Date(1514764800000L))
-                .enteredDate(new Date(1514764800000L))
-                .hasLeft(false)
-                .leftDate(null)
-                .isPassive(false)
-                .accountHolder("Max Mustermann")
-                .build();
     }
 }
