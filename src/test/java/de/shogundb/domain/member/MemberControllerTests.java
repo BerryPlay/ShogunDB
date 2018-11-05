@@ -10,6 +10,9 @@ import de.shogundb.domain.discipline.DisciplineRepository;
 import de.shogundb.domain.event.Event;
 import de.shogundb.domain.event.EventNotFoundException;
 import de.shogundb.domain.event.EventRepository;
+import de.shogundb.domain.seminar.Seminar;
+import de.shogundb.domain.seminar.SeminarNotFoundException;
+import de.shogundb.domain.seminar.SeminarRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 import static de.shogundb.TestHelper.createTestMember;
+import static de.shogundb.TestHelper.createTestSeminar;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -53,6 +57,9 @@ public class MemberControllerTests {
 
     @Autowired
     private EventRepository eventRepository;
+
+    @Autowired
+    private SeminarRepository seminarRepository;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -202,6 +209,7 @@ public class MemberControllerTests {
                 .additionalContribution(5)
                 .build());
 
+        // create two test disciplines
         Discipline discipline1 = disciplineRepository.save(Discipline.builder()
                 .name("Test Discipline")
                 .build());
@@ -212,6 +220,7 @@ public class MemberControllerTests {
                 .name("Another Test Discipline")
                 .build());
 
+        // create two test events
         Event event1 = eventRepository.save(Event.builder()
                 .name("Test Event")
                 .date(new Date(1523318400000L))
@@ -224,13 +233,26 @@ public class MemberControllerTests {
                 .date(new Date(1523318400000L))
                 .build());
 
+        // create two test seminars
+        Seminar seminar1 = seminarRepository.save(createTestSeminar());
+        member.getSeminars().add(seminar1);
+        seminar1.getMembers().add(member);
+
+        Seminar seminar2 = seminarRepository.save(createTestSeminar());
+
         member = memberRepository.save(member);
 
-        List<Long> disciplines = new ArrayList<>();
-        List<Long> events = new ArrayList<>();
+        List<Long> disciplines = new ArrayList<Long>() {{
+            add(discipline2.getId());
+        }};
 
-        disciplines.add(discipline2.getId());
-        events.add(event2.getId());
+        List<Long> events = new ArrayList<Long>() {{
+            add(event2.getId());
+        }};
+
+        List<Long> seminars = new ArrayList<Long>() {{
+            add(seminar2.getId());
+        }};
 
         // test member
         MemberUpdateDTO updateMember = MemberUpdateDTO.builder()
@@ -254,6 +276,7 @@ public class MemberControllerTests {
                 .notes("Test Notes")
                 .disciplines(disciplines)
                 .events(events)
+                .seminars(seminars)
                 .accountHolder("Max Mustermann")
                 .build();
 
@@ -283,23 +306,22 @@ public class MemberControllerTests {
                 .andExpect(jsonPath("$.disciplines").value(hasSize(1)))
                 .andExpect(jsonPath("$.disciplines[0].id").value(is(discipline2.getId().intValue())))
                 .andExpect(jsonPath("$.events").value(hasSize(1)))
-                .andExpect(jsonPath("$.events[0].id").value(is(event2.getId().intValue())));
+                .andExpect(jsonPath("$.events[0].id").value(is(event2.getId().intValue())))
+                .andExpect(jsonPath("$.seminars").value(hasSize(1)))
+                .andExpect(jsonPath("$.seminars[0].id").value(is(seminar2.getId().intValue())));
 
-        final Discipline finalDiscipline1
-                = disciplineRepository.findById(discipline1.getId()).orElseThrow(DisciplineNotFoundException::new);
-        final Discipline finalDiscipline2
-                = disciplineRepository.findById(discipline2.getId()).orElseThrow(DisciplineNotFoundException::new);
+        final Discipline finalDiscipline1 = disciplineRepository.findOne(discipline1.getId());
+        final Discipline finalDiscipline2 = disciplineRepository.findOne(discipline2.getId());
 
-        final Event finalEvent1 = eventRepository.findById(event1.getId()).orElseThrow(EventNotFoundException::new);
-        final Event finalEvent2 = eventRepository.findById(event2.getId()).orElseThrow(EventNotFoundException::new);
+        final Event finalEvent1 = eventRepository.findOne(event1.getId());
+        final Event finalEvent2 = eventRepository.findOne(event2.getId());
 
-        final ContributionClass finalContributionClass = contributionClassRepository
-                .findById(contributionClass.getId())
-                .orElseThrow(ContributionClassNotFoundException::new);
+        final Seminar finalSeminar1 = seminarRepository.findOne(seminar1.getId());
+        final Seminar finalSeminar2 = seminarRepository.findOne(seminar2.getId());
 
-        final ContributionClass finalOldContributionClass = contributionClassRepository
-                .findById(oldContributionClassId)
-                .orElseThrow(ContributionClassNotFoundException::new);
+        final ContributionClass finalContributionClass = contributionClassRepository.findOne(contributionClass.getId());
+
+        final ContributionClass finalOldContributionClass = contributionClassRepository.findOne(oldContributionClassId);
 
         memberRepository.findAll().forEach(
                 existing -> {
@@ -326,6 +348,15 @@ public class MemberControllerTests {
                     assertFalse(finalEvent1.getMembers().contains(existing));
                     assertTrue(existing.getEvents().contains(finalEvent2));
                     assertTrue(finalEvent2.getMembers().contains(existing));
+
+                    // seminars
+                    assertEquals(1, existing.getSeminars().size());
+                    assertEquals(0, finalSeminar1.getMembers().size());
+                    assertEquals(1, finalSeminar2.getMembers().size());
+                    assertFalse(existing.getSeminars().contains(finalSeminar1));
+                    assertFalse(finalSeminar1.getMembers().contains(existing));
+                    assertTrue(existing.getSeminars().contains(finalSeminar2));
+                    assertTrue(finalSeminar2.getMembers().contains(existing));
                 });
 
         memberJson = memberJson.replace("\"id\":" + member.getId().toString(), "\"id\":-1");
@@ -356,19 +387,24 @@ public class MemberControllerTests {
                 .date(new Date(1514764800000L))
                 .build());
 
+        Seminar seminar = seminarRepository.save(createTestSeminar());
+
         member.setContributionClass(contributionClass);
         member.getDisciplines().add(discipline);
         member.getEvents().add(event);
+        member.getSeminars().add(seminar);
 
         contributionClass.getMembers().add(member);
         discipline.getMembers().add(member);
         event.getMembers().add(member);
+        seminar.getMembers().add(member);
 
         member = memberRepository.save(member);
 
         assertTrue(contributionClass.getMembers().contains(member));
         assertTrue(discipline.getMembers().contains(member));
         assertTrue(event.getMembers().contains(member));
+        assertTrue(seminar.getMembers().contains(member));
 
         mockMvc.perform(delete("/member/" + member.getId()))
                 .andExpect(status().isNoContent());
@@ -384,9 +420,12 @@ public class MemberControllerTests {
 
         event = eventRepository.findById(event.getId()).orElseThrow(EventNotFoundException::new);
 
+        seminar = seminarRepository.findById(seminar.getId()).orElseThrow(SeminarNotFoundException::new);
+
         assertEquals(0, contributionClass.getMembers().size());
         assertEquals(0, discipline.getMembers().size());
         assertEquals(0, event.getMembers().size());
+        assertEquals(0, seminar.getMembers().size());
 
         // check, if member is detached from contribution class, events and disciplines
         disciplineRepository.findAll().forEach(existing -> assertEquals(0, existing.getMembers().size()));

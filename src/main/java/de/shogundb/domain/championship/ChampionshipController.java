@@ -1,6 +1,5 @@
 package de.shogundb.domain.championship;
 
-import de.shogundb.domain.member.Gender;
 import de.shogundb.domain.member.Member;
 import de.shogundb.domain.member.MemberNotFoundException;
 import de.shogundb.domain.member.MemberRepository;
@@ -12,7 +11,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -133,46 +131,5 @@ public class ChampionshipController {
     public ResponseEntity<Championship> show(@PathVariable Long id) throws ChampionshipNotFoundException {
         return ResponseEntity.ok(this.championshipRepository.findById(id)
                 .orElseThrow(() -> new ChampionshipNotFoundException(id)));
-    }
-
-    @RequestMapping(method = RequestMethod.HEAD)
-    public ResponseEntity<?> add() {
-        Member member = this.memberRepository.save(Member.builder()
-                .forename("Max")
-                .surname("Mustermann")
-                .gender(Gender.MALE)
-                .street("Musterstraße")
-                .postcode("26721")
-                .phoneNumber("04929 5435438")
-                .mobileNumber("1522 416845575")
-                .email("max@muster.de")
-                .dateOfBirth(new Date(810086400000L))
-                .hasBudoPass(true)
-                .budoPassDate(new Date(1514764800000L))
-                .enteredDate(new Date(1514764800000L))
-                .hasLeft(false)
-                .leftDate(null)
-                .isPassive(false)
-                .accountHolder("Max Mustermann")
-                .build());
-
-        Championship championship = this.championshipRepository.save(Championship.builder()
-                .name("Test Championship")
-                .date(new Date(1514764800000L))
-                .build());
-
-        ChampionshipMember championshipMember = ChampionshipMember.builder()
-                .championship(championship)
-                .member(member)
-                .extra("Gew. Klasse bis 50kg")
-                .rank(2)
-                .build();
-
-        member.getChampionships().add(championshipMember);
-        championship.getMembers().add(championshipMember);
-
-        this.championshipMemberRepository.save(championshipMember);
-
-        return ResponseEntity.ok("LOL");
     }
 }

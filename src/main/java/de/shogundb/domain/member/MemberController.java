@@ -9,6 +9,9 @@ import de.shogundb.domain.discipline.DisciplineRepository;
 import de.shogundb.domain.event.Event;
 import de.shogundb.domain.event.EventNotFoundException;
 import de.shogundb.domain.event.EventRepository;
+import de.shogundb.domain.seminar.Seminar;
+import de.shogundb.domain.seminar.SeminarNotFoundException;
+import de.shogundb.domain.seminar.SeminarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +30,15 @@ public class MemberController {
     private final MemberRepository memberRepository;
     private final ContributionClassRepository contributionClassRepository;
     private final DisciplineRepository disciplineRepository;
+    private final SeminarRepository seminarRepository;
     private final EventRepository eventRepository;
 
     @Autowired
-    public MemberController(MemberRepository memberRepository, ContributionClassRepository contributionClassRepository, DisciplineRepository disciplineRepository, EventRepository eventRepository) {
+    public MemberController(MemberRepository memberRepository, ContributionClassRepository contributionClassRepository, DisciplineRepository disciplineRepository, SeminarRepository seminarRepository, EventRepository eventRepository) {
         this.memberRepository = memberRepository;
         this.contributionClassRepository = contributionClassRepository;
         this.disciplineRepository = disciplineRepository;
+        this.seminarRepository = seminarRepository;
         this.eventRepository = eventRepository;
     }
 
@@ -102,7 +107,7 @@ public class MemberController {
     }
 
     @PutMapping
-    public ResponseEntity<Member> update(@RequestBody @Valid MemberUpdateDTO member) throws MemberNotFoundException, ContributionClassNotFoundException, DisciplineNotFoundException, EventNotFoundException {
+    public ResponseEntity<Member> update(@RequestBody @Valid MemberUpdateDTO member) throws MemberNotFoundException, ContributionClassNotFoundException, DisciplineNotFoundException, EventNotFoundException, SeminarNotFoundException {
         // get existing member from database
         Member existingMember = this.memberRepository.findById(member.getId())
                 .orElseThrow(() -> new MemberNotFoundException(member.getId()));
@@ -156,6 +161,21 @@ public class MemberController {
             event.getMembers().add(existingMember);
         }
 
+        // setup seminars
+        List<Seminar> seminars = new ArrayList<Seminar>() {{
+            for (Long seminarId : member.getSeminars()) {
+                add(seminarRepository.findById(seminarId).orElseThrow(() -> new SeminarNotFoundException(seminarId)));
+            }
+        }};
+
+        // apply member and seminars
+        existingMember.getSeminars().forEach(existing -> existing.getMembers().remove(finalMember));
+        existingMember.setSeminars(seminars);
+        for (Seminar seminar : seminars) {
+            seminar.getMembers().add(existingMember);
+        }
+
+        // set the values
         existingMember.setForename(member.getForename());
         existingMember.setSurname(member.getSurname());
         existingMember.setGender(member.getGender());
@@ -195,8 +215,15 @@ public class MemberController {
         for (Discipline discipline : member.getDisciplines()) {
             discipline.getMembers().remove(member);
         }
-        member.getEvents().clear();
+        member.getDisciplines().clear();
 
+        // remove seminars
+        for (Seminar seminar : member.getSeminars()) {
+            seminar.getMembers().remove(member);
+        }
+        member.getSeminars().clear();
+
+        // remove contribution class
         member.getContributionClass().getMembers().remove(member);
         member.setContributionClass(null);
 

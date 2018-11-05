@@ -94,4 +94,7 @@ class MemberUpdateDTO {
 
     @Builder.Default
     private List<Long> events = new ArrayList<>();
+
+    @Builder.Default
+    private List<Long> seminars = new ArrayList<>();
 }
