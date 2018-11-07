@@ -74,6 +74,9 @@ public class SeminarPersonControllerTests {
                 .andExpect(jsonPath("$[0].name").value(is(referent1.getName())))
                 .andExpect(jsonPath("$[1].id").value(is(referent2.getId().intValue())))
                 .andExpect(jsonPath("$[1].name").value(is(referent2.getName())));
+
+        mockMvc.perform(get("/seminar/person/-1"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
