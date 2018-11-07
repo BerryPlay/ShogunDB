@@ -22,6 +22,13 @@ public class SeminarMemberController {
         this.memberRepository = memberRepository;
     }
 
+    /**
+     * Get all members of the seminar with the given id.
+     *
+     * @param seminarId the unique identifier of the seminar
+     * @return a HTTP 200 OK and a list of all persons of the seminar
+     * @throws SeminarNotFoundException thrown, if the seminar does not exist
+     */
     @GetMapping("/{seminarId}")
     public ResponseEntity<Iterable<Member>> index(@PathVariable Long seminarId) throws SeminarNotFoundException {
         Seminar seminar = seminarRepository.findById(seminarId)
@@ -30,6 +37,15 @@ public class SeminarMemberController {
         return ResponseEntity.ok(seminar.getMembers());
     }
 
+    /**
+     * Adds an existing member to an existing seminar.
+     *
+     * @param seminarId the unique identifier of the seminar
+     * @param memberId  the unique identifier of the member
+     * @return a HTTP 201 CREATED if the member was successfully added to the seminar
+     * @throws SeminarNotFoundException thrown, if the seminar does not exist
+     * @throws MemberNotFoundException  thrown, if the member does not exist
+     */
     @PostMapping("/{seminarId}/{memberId}")
     public ResponseEntity<?> store(@PathVariable Long seminarId, @PathVariable Long memberId)
             throws SeminarNotFoundException, MemberNotFoundException {
@@ -53,6 +69,15 @@ public class SeminarMemberController {
         return ResponseEntity.created(uri).build();
     }
 
+    /**
+     * Removes the member with the given id from the seminar with the given id.
+     *
+     * @param seminarId the unique identifier of the seminar
+     * @param memberId  the unique identifier of the member
+     * @return a HTTP 204 NO CONTENT if the member was successfully removed from the seminar
+     * @throws SeminarNotFoundException thrown, if the seminar does not exist
+     * @throws MemberNotFoundException  thrown, if the member does not exist
+     */
     @DeleteMapping("/{seminarId}/{memberId}")
     public ResponseEntity<?> delete(@PathVariable Long seminarId, @PathVariable Long memberId)
             throws SeminarNotFoundException, MemberNotFoundException {
