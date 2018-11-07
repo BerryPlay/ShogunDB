@@ -85,6 +85,10 @@ public class SeminarPersonControllerTests {
         mockMvc.perform(post("/seminar/person/" + seminar.getId() + "/" + referent.getId()))
                 .andExpect(status().isCreated());
 
+        // try to do the same request again (should be a conflict now)
+        mockMvc.perform(post("/seminar/person/" + seminar.getId() + "/" + referent.getId()))
+                .andExpect(status().isConflict());
+
         // get the updated entities
         Seminar updatedSeminar = seminarRepository.findOne(seminar.getId());
         Person updatedReferent = personRepository.findOne(referent.getId());

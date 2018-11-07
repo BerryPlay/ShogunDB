@@ -55,12 +55,17 @@ public class SeminarPersonController {
 
         Person referent = personRepository.findById(personId).orElseThrow(() -> new PersonNotFoundException(personId));
 
+        if (seminar.getReferents().contains(referent) || referent.getSeminars().contains(seminar)) {
+            return ResponseEntity.status(409).build();
+        }
+
         // link the referent and the seminar
         seminar.getReferents().add(referent);
         referent.getSeminars().add(seminar);
 
-        URI uri = MvcUriComponentsBuilder.fromController(getClass()).path("/event/member/")
-                .buildAndExpand(seminar.getId()).toUri();
+        seminar = seminarRepository.save(seminar);
+
+        URI uri = MvcUriComponentsBuilder.fromController(getClass()).buildAndExpand(seminar.getId()).toUri();
 
         return ResponseEntity.created(uri).build();
     }
