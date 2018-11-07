@@ -98,7 +98,7 @@ public class DisciplineControllerTests {
                 .name("New Name")
                 .build();
 
-        mockMvc.perform(post("/discipline")
+        mockMvc.perform(put("/discipline")
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(toJson(disciplineUpdateDTO)))
                 .andExpect(status().isCreated())
