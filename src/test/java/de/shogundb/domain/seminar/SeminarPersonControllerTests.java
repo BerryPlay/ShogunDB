@@ -20,6 +20,8 @@ import static de.shogundb.TestHelper.createTestSeminar;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -106,5 +108,38 @@ public class SeminarPersonControllerTests {
         // destructive test with wrong person id
         mockMvc.perform(post("/seminar/person/" + seminar.getId() + "/-1"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void person_can_be_removed_from_seminar() throws Exception {
+        // add a seminar
+        Seminar seminar = createTestSeminar();
+
+        // add referents
+        Person referent1 = personRepository.save(createTestPerson());
+        Person referent2 = personRepository.save(createTestPerson());
+
+        // link referents to the seminar
+        seminar.getReferents().add(referent1);
+        seminar.getReferents().add(referent2);
+        referent1.getSeminars().add(seminar);
+        referent2.getSeminars().add(seminar);
+
+        // save everything to the database
+        seminar = seminarRepository.save(seminar);
+
+        mockMvc.perform(delete("/seminar/person/" + seminar.getId() + "/" + referent1.getId()))
+                .andExpect(status().isNoContent());
+
+        // update the previous entities
+        seminar = this.seminarRepository.findOne(seminar.getId());
+        referent1 = this.personRepository.findOne(referent1.getId());
+        referent2 = this.personRepository.findOne(referent2.getId());
+
+        assertEquals(1, seminar.getReferents().size());
+        assertEquals(referent2, seminar.getReferents().get(0));
+        assertFalse(seminar.getReferents().contains(referent1));
+
+        assertEquals(0, referent1.getSeminars().size());
     }
 }

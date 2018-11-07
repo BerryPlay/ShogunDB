@@ -69,4 +69,33 @@ public class SeminarPersonController {
 
         return ResponseEntity.created(uri).build();
     }
+
+    /**
+     * Removes the person with the given id from the seminar with the given id.
+     *
+     * @param seminarId the unique identifier of the seminar
+     * @param personId  the unique identifier of the person
+     * @return a HTTP 204 NO CONTENT if the person was successfully removed from the seminar
+     * @throws SeminarNotFoundException thrown, if the seminar does not exist
+     * @throws PersonNotFoundException  thrown, if the person does not exist
+     */
+    @DeleteMapping("/{seminarId}/{personId}")
+    private ResponseEntity<?> delete(@PathVariable Long seminarId, @PathVariable Long personId)
+            throws SeminarNotFoundException, PersonNotFoundException {
+        Seminar seminar = seminarRepository.findById(seminarId)
+                .orElseThrow(() -> new SeminarNotFoundException(seminarId));
+
+        Person referent = personRepository.findById(personId).orElseThrow(() -> new PersonNotFoundException(personId));
+
+        if (!seminar.getReferents().contains(referent) || !referent.getSeminars().contains(seminar)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        seminar.getReferents().remove(referent);
+        referent.getSeminars().remove(seminar);
+
+        seminarRepository.save(seminar);
+
+        return ResponseEntity.noContent().build();
+    }
 }
