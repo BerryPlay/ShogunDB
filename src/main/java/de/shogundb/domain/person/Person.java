@@ -1,5 +1,7 @@
 package de.shogundb.domain.person;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.shogundb.domain.graduation.Exam;
 import de.shogundb.domain.seminar.Seminar;
 import lombok.*;
 
@@ -32,4 +34,14 @@ public class Person {
             mappedBy = "referents")
     @Builder.Default
     private List<Seminar> seminars = new ArrayList<>();
+
+    @ManyToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.REFRESH},
+            mappedBy = "examiners")
+    @JsonIgnore
+    @Builder.Default
+    private List<Exam> exams = new ArrayList<>();
 }

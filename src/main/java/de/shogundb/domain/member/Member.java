@@ -5,6 +5,7 @@ import de.shogundb.domain.championship.ChampionshipMember;
 import de.shogundb.domain.contributionClass.ContributionClass;
 import de.shogundb.domain.discipline.Discipline;
 import de.shogundb.domain.event.Event;
+import de.shogundb.domain.graduation.GraduationMember;
 import de.shogundb.domain.seminar.Seminar;
 import lombok.*;
 
@@ -121,6 +122,15 @@ public class Member extends BaseEntity {
             mappedBy = "members")
     @Builder.Default
     private List<Event> events = new ArrayList<>();
+
+    @OneToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.REFRESH},
+            mappedBy = "member")
+    @Builder.Default
+    private List<GraduationMember> graduations = new ArrayList<>();
 
     @ManyToMany(cascade = {
             CascadeType.PERSIST,
