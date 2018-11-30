@@ -13,8 +13,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -66,20 +66,20 @@ public class Member extends BaseEntity {
     private String email;
 
     @NotNull
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @NotNull
     private Boolean hasBudoPass;
 
-    private Date budoPassDate;
+    private LocalDate budoPassDate;
 
     @NotNull
-    private Date enteredDate;
+    private LocalDate enteredDate;
 
     @NotNull
     private Boolean hasLeft;
 
-    private Date leftDate;
+    private LocalDate leftDate;
 
     @NotNull
     private Boolean isPassive;

@@ -162,7 +162,7 @@ public class MemberController {
         }
 
         // setup seminars
-        List<Seminar> seminars = new ArrayList<Seminar>() {{
+        List<Seminar> seminars = new ArrayList<>() {{
             for (Long seminarId : member.getSeminars()) {
                 add(seminarRepository.findById(seminarId).orElseThrow(() -> new SeminarNotFoundException(seminarId)));
             }
@@ -228,7 +228,7 @@ public class MemberController {
         member.setContributionClass(null);
 
         member = this.memberRepository.save(member);
-        this.memberRepository.delete(member.getId());
+        this.memberRepository.delete(member);
 
         return ResponseEntity.noContent().build();
     }

@@ -26,8 +26,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static de.shogundb.TestHelper.createTestMember;
@@ -90,12 +90,12 @@ public class MemberControllerTests {
                 .andExpect(jsonPath("$[0].phoneNumber").value(is(member.getPhoneNumber())))
                 .andExpect(jsonPath("$[0].mobileNumber").value(is(member.getMobileNumber())))
                 .andExpect(jsonPath("$[0].email").value(is(member.getEmail())))
-                .andExpect(jsonPath("$[0].dateOfBirth").value(is(member.getDateOfBirth().getTime())))
+                .andExpect(jsonPath("$[0].dateOfBirth").value(is(member.getDateOfBirth().toString())))
                 .andExpect(jsonPath("$[0].hasBudoPass").value(is(member.getHasBudoPass())))
-                .andExpect(jsonPath("$[0].budoPassDate").value(is(member.getBudoPassDate().getTime())))
-                .andExpect(jsonPath("$[0].enteredDate").value(is(member.getEnteredDate().getTime())))
+                .andExpect(jsonPath("$[0].budoPassDate").value(is(member.getBudoPassDate().toString())))
+                .andExpect(jsonPath("$[0].enteredDate").value(is(member.getEnteredDate().toString())))
                 .andExpect(jsonPath("$[0].hasLeft").value(is(member.getHasLeft())))
-                .andExpect(jsonPath("$[0].leftDate").value(is(member.getLeftDate())))
+                .andExpect(jsonPath("$[0].leftDate").value(is(member.getLeftDate().toString())))
                 .andExpect(jsonPath("$[0].isPassive").value(is(member.getIsPassive())))
                 .andExpect(jsonPath("$[0].accountHolder").value(is(member.getAccountHolder())))
                 .andExpect(jsonPath("$[0].disciplines").value(is(member.getDisciplines())));
@@ -132,12 +132,12 @@ public class MemberControllerTests {
                 .phoneNumber("04929 5435438")
                 .mobileNumber("1522 416845575")
                 .email("max@muster.de")
-                .dateOfBirth(new Date(810086400000L))
+                .dateOfBirth(LocalDate.parse("2018-01-02"))
                 .hasBudoPass(true)
-                .budoPassDate(new Date(1514764800000L))
-                .enteredDate(new Date(1514764800000L))
-                .hasLeft(false)
-                .leftDate(null)
+                .budoPassDate(LocalDate.parse("2018-01-02"))
+                .enteredDate(LocalDate.parse("2018-01-02"))
+                .hasLeft(true)
+                .leftDate(LocalDate.parse("2018-01-03"))
                 .isPassive(false)
                 .contributionClass(contributionClass.getId())
                 .accountHolder("Max Mustermann")
@@ -159,12 +159,12 @@ public class MemberControllerTests {
                 .andExpect(jsonPath("$.phoneNumber").value(is(memberRegisterDTO.getPhoneNumber())))
                 .andExpect(jsonPath("$.mobileNumber").value(is(memberRegisterDTO.getMobileNumber())))
                 .andExpect(jsonPath("$.email").value(is(memberRegisterDTO.getEmail())))
-                .andExpect(jsonPath("$.dateOfBirth").value(is(memberRegisterDTO.getDateOfBirth().getTime())))
+                .andExpect(jsonPath("$.dateOfBirth").value(is(memberRegisterDTO.getDateOfBirth().toString())))
                 .andExpect(jsonPath("$.hasBudoPass").value(is(memberRegisterDTO.getHasBudoPass())))
-                .andExpect(jsonPath("$.budoPassDate").value(is(memberRegisterDTO.getBudoPassDate().getTime())))
-                .andExpect(jsonPath("$.enteredDate").value(is(memberRegisterDTO.getEnteredDate().getTime())))
+                .andExpect(jsonPath("$.budoPassDate").value(is(memberRegisterDTO.getBudoPassDate().toString())))
+                .andExpect(jsonPath("$.enteredDate").value(is(memberRegisterDTO.getEnteredDate().toString())))
                 .andExpect(jsonPath("$.hasLeft").value(is(memberRegisterDTO.getHasLeft())))
-                .andExpect(jsonPath("$.leftDate").value(is(memberRegisterDTO.getLeftDate())))
+                .andExpect(jsonPath("$.leftDate").value(is(memberRegisterDTO.getLeftDate().toString())))
                 .andExpect(jsonPath("$.isPassive").value(is(memberRegisterDTO.getIsPassive())))
                 .andExpect(jsonPath("$.accountHolder").value(is(memberRegisterDTO.getAccountHolder())));
 
@@ -223,14 +223,14 @@ public class MemberControllerTests {
         // create two test events
         Event event1 = eventRepository.save(Event.builder()
                 .name("Test Event")
-                .date(new Date(1523318400000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
         member.getEvents().add(event1);
         event1.getMembers().add(member);
 
         Event event2 = eventRepository.save(Event.builder()
                 .name("Another Test Event")
-                .date(new Date(1523318400000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         // create two test seminars
@@ -265,12 +265,12 @@ public class MemberControllerTests {
                 .phoneNumber("04929 5435438")
                 .mobileNumber("1522 416845575")
                 .email("newemail@internet.com")
-                .dateOfBirth(new Date(810086400000L))
+                .dateOfBirth(LocalDate.parse("2018-01-02"))
                 .hasBudoPass(true)
-                .budoPassDate(new Date(1523318400000L))
-                .enteredDate(new Date(1514764800000L))
-                .hasLeft(false)
-                .leftDate(null)
+                .budoPassDate(LocalDate.parse("2018-01-02"))
+                .enteredDate(LocalDate.parse("2018-01-02"))
+                .hasLeft(true)
+                .leftDate(LocalDate.parse("2018-01-03"))
                 .isPassive(false)
                 .contributionClass(contributionClass.getId())
                 .notes("Test Notes")
@@ -295,12 +295,12 @@ public class MemberControllerTests {
                 .andExpect(jsonPath("$.phoneNumber").value(is(updateMember.getPhoneNumber())))
                 .andExpect(jsonPath("$.mobileNumber").value(is(updateMember.getMobileNumber())))
                 .andExpect(jsonPath("$.email").value(is(updateMember.getEmail())))
-                .andExpect(jsonPath("$.dateOfBirth").value(is(updateMember.getDateOfBirth().getTime())))
+                .andExpect(jsonPath("$.dateOfBirth").value(is(updateMember.getDateOfBirth().toString())))
                 .andExpect(jsonPath("$.hasBudoPass").value(is(updateMember.getHasBudoPass())))
-                .andExpect(jsonPath("$.budoPassDate").value(is(updateMember.getBudoPassDate().getTime())))
-                .andExpect(jsonPath("$.enteredDate").value(is(updateMember.getEnteredDate().getTime())))
+                .andExpect(jsonPath("$.budoPassDate").value(is(updateMember.getBudoPassDate().toString())))
+                .andExpect(jsonPath("$.enteredDate").value(is(updateMember.getEnteredDate().toString())))
                 .andExpect(jsonPath("$.hasLeft").value(is(updateMember.getHasLeft())))
-                .andExpect(jsonPath("$.leftDate").value(is(updateMember.getLeftDate())))
+                .andExpect(jsonPath("$.leftDate").value(is(updateMember.getLeftDate().toString())))
                 .andExpect(jsonPath("$.isPassive").value(is(updateMember.getIsPassive())))
                 .andExpect(jsonPath("$.accountHolder").value(is(updateMember.getAccountHolder())))
                 .andExpect(jsonPath("$.disciplines").value(hasSize(1)))
@@ -310,18 +310,20 @@ public class MemberControllerTests {
                 .andExpect(jsonPath("$.seminars").value(hasSize(1)))
                 .andExpect(jsonPath("$.seminars[0].id").value(is(seminar2.getId().intValue())));
 
-        final Discipline finalDiscipline1 = disciplineRepository.findOne(discipline1.getId());
-        final Discipline finalDiscipline2 = disciplineRepository.findOne(discipline2.getId());
+        final Discipline finalDiscipline1 = disciplineRepository.findById(discipline1.getId()).orElseThrow();
+        final Discipline finalDiscipline2 = disciplineRepository.findById(discipline2.getId()).orElseThrow();
 
-        final Event finalEvent1 = eventRepository.findOne(event1.getId());
-        final Event finalEvent2 = eventRepository.findOne(event2.getId());
+        final Event finalEvent1 = eventRepository.findById(event1.getId()).orElseThrow();
+        final Event finalEvent2 = eventRepository.findById(event2.getId()).orElseThrow();
 
-        final Seminar finalSeminar1 = seminarRepository.findOne(seminar1.getId());
-        final Seminar finalSeminar2 = seminarRepository.findOne(seminar2.getId());
+        final Seminar finalSeminar1 = seminarRepository.findById(seminar1.getId()).orElseThrow();
+        final Seminar finalSeminar2 = seminarRepository.findById(seminar2.getId()).orElseThrow();
 
-        final ContributionClass finalContributionClass = contributionClassRepository.findOne(contributionClass.getId());
+        final ContributionClass finalContributionClass = contributionClassRepository.findById(contributionClass.getId())
+                .orElseThrow();
 
-        final ContributionClass finalOldContributionClass = contributionClassRepository.findOne(oldContributionClassId);
+        final ContributionClass finalOldContributionClass = contributionClassRepository.findById(oldContributionClassId)
+                .orElseThrow();
 
         memberRepository.findAll().forEach(
                 existing -> {
@@ -384,7 +386,7 @@ public class MemberControllerTests {
 
         Event event = eventRepository.save(Event.builder()
                 .name("Test Event")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         Seminar seminar = seminarRepository.save(createTestSeminar());
@@ -454,12 +456,12 @@ public class MemberControllerTests {
                 .andExpect(jsonPath("$[0].phoneNumber").value(is(member.getPhoneNumber())))
                 .andExpect(jsonPath("$[0].mobileNumber").value(is(member.getMobileNumber())))
                 .andExpect(jsonPath("$[0].email").value(is(member.getEmail())))
-                .andExpect(jsonPath("$[0].dateOfBirth").value(is(member.getDateOfBirth().getTime())))
+                .andExpect(jsonPath("$[0].dateOfBirth").value(is(member.getDateOfBirth().toString())))
                 .andExpect(jsonPath("$[0].hasBudoPass").value(is(member.getHasBudoPass())))
-                .andExpect(jsonPath("$[0].budoPassDate").value(is(member.getBudoPassDate().getTime())))
-                .andExpect(jsonPath("$[0].enteredDate").value(is(member.getEnteredDate().getTime())))
+                .andExpect(jsonPath("$[0].budoPassDate").value(is(member.getBudoPassDate().toString())))
+                .andExpect(jsonPath("$[0].enteredDate").value(is(member.getEnteredDate().toString())))
                 .andExpect(jsonPath("$[0].hasLeft").value(is(member.getHasLeft())))
-                .andExpect(jsonPath("$[0].leftDate").value(is(member.getLeftDate())))
+                .andExpect(jsonPath("$[0].leftDate").value(is(member.getLeftDate().toString())))
                 .andExpect(jsonPath("$[0].isPassive").value(is(member.getIsPassive())))
                 .andExpect(jsonPath("$[0].accountHolder").value(is(member.getAccountHolder())))
                 .andExpect(jsonPath("$[0].disciplines").value(is(member.getDisciplines())));

@@ -102,7 +102,7 @@ public class EventController {
                     this.eventRepository.save(existing);
 
                     // delete event
-                    this.eventRepository.delete(id);
+                    this.eventRepository.delete(existing);
                     return ResponseEntity.noContent().build();
                 }).orElseThrow(() -> new EventNotFoundException(id));
     }

@@ -1,15 +1,13 @@
 package de.shogundb.domain.graduation;
 
+import de.shogundb.domain.BaseEntity;
 import de.shogundb.domain.person.Person;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -17,7 +15,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Exam {
+@EqualsAndHashCode(callSuper = true)
+public class Exam extends BaseEntity {
     /**
      * The unique identifier of the seminar.
      * Will be automatically generated.
@@ -30,7 +29,7 @@ public class Exam {
      * The date of the exam.
      */
     @NotNull
-    private Date date;
+    private LocalDate date;
 
     /**
      * All graduations (connections between a member and a graduation).
@@ -58,3 +57,6 @@ public class Exam {
     @Builder.Default
     private List<Person> examiners = new ArrayList<>();
 }
+
+
+

@@ -17,8 +17,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static de.shogundb.TestHelper.createTestMember;
@@ -64,7 +64,7 @@ public class ChampionshipControllerTests {
     public void all_championships_can_be_called() throws Exception {
         Championship championship = championshipRepository.save(Championship.builder()
                 .name("Test Championship")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         mockMvc.perform(get("/championship"))
@@ -72,7 +72,7 @@ public class ChampionshipControllerTests {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id").value(is(championship.getId().intValue())))
                 .andExpect(jsonPath("$[0].name").value(is(championship.getName())))
-                .andExpect(jsonPath("$[0].date").value(is(championship.getDate().getTime())));
+                .andExpect(jsonPath("$[0].date").value(is(championship.getDate().toString())));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class ChampionshipControllerTests {
 
         ChampionshipRegisterDTO championshipRegisterDTO = ChampionshipRegisterDTO.builder()
                 .name("Test Championship")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .members(members)
                 .build();
 
@@ -102,7 +102,7 @@ public class ChampionshipControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(notNullValue()))
                 .andExpect(jsonPath("$.name").value(is(championshipRegisterDTO.getName())))
-                .andExpect(jsonPath("$.date").value(is(championshipRegisterDTO.getDate().getTime())));
+                .andExpect(jsonPath("$.date").value(is(championshipRegisterDTO.getDate().toString())));
 
         assertEquals(1L, championshipRepository.count());
 
@@ -133,7 +133,7 @@ public class ChampionshipControllerTests {
 
         Championship championship = championshipRepository.save(Championship.builder()
                 .name("Test Championship")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         ChampionshipMember championshipMember = ChampionshipMember.builder()
@@ -160,7 +160,7 @@ public class ChampionshipControllerTests {
         ChampionshipUpdateDTO championshipUpdateDTO = ChampionshipUpdateDTO.builder()
                 .id(championship.getId())
                 .name("Updated Championship")
-                .date(new Date(1514764800800L))
+                .date(LocalDate.parse("2018-01-02"))
                 .members(members)
                 .build();
 
@@ -170,7 +170,7 @@ public class ChampionshipControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(notNullValue()))
                 .andExpect(jsonPath("$.name").value(is(championshipUpdateDTO.getName())))
-                .andExpect(jsonPath("$.date").value(is(championshipUpdateDTO.getDate().getTime())));
+                .andExpect(jsonPath("$.date").value(is(championshipUpdateDTO.getDate().toString())));
 
         member1 = memberRepository.findById(member1.getId()).orElseThrow(MemberNotFoundException::new);
         member2 = memberRepository.findById(member2.getId()).orElseThrow(MemberNotFoundException::new);
@@ -195,7 +195,7 @@ public class ChampionshipControllerTests {
 
         Championship championship = championshipRepository.save(Championship.builder()
                 .name("Test Championship")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         ChampionshipMember championshipMember = ChampionshipMember.builder()
@@ -227,14 +227,14 @@ public class ChampionshipControllerTests {
     public void championship_can_be_called_by_id() throws Exception {
         Championship championship = championshipRepository.save(Championship.builder()
                 .name("Test Championship")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         mockMvc.perform(get("/championship/" + championship.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(championship.getId().intValue())))
                 .andExpect(jsonPath("$.name", is(championship.getName())))
-                .andExpect(jsonPath("$.date", is(championship.getDate().getTime())));
+                .andExpect(jsonPath("$.date", is(championship.getDate().toString())));
 
         mockMvc.perform(get("/championship/-1"))
                 .andExpect(status().isConflict());

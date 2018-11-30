@@ -9,6 +9,8 @@ import de.shogundb.domain.person.Person;
 import de.shogundb.domain.seminar.Seminar;
 import de.shogundb.domain.seminar.SeminarType;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class TestHelper {
@@ -20,10 +22,10 @@ public class TestHelper {
      */
     public static String toJson(Object o) {
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context)
-                        -> new Date(json.getAsJsonPrimitive().getAsLong()))
-                .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (date, type, jsonSerializationContext)
-                        -> new JsonPrimitive(date.getTime()))
+                .registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>) (date, type, jsonSerializationContext)
+                        -> new JsonPrimitive(date.toString()))
+                .registerTypeAdapter(LocalDateTime.class, (JsonSerializer<LocalDateTime>) (date, type, jsonSerializationContext)
+                        -> new JsonPrimitive(date.toString()))
                 .create();
 
         return gson.toJson(o);
@@ -45,12 +47,12 @@ public class TestHelper {
                 .phoneNumber("04929 5435438")
                 .mobileNumber("1522 416845575")
                 .email("max@muster.de")
-                .dateOfBirth(new Date(810086400000L))
+                .dateOfBirth(LocalDate.parse("2018-01-02"))
                 .hasBudoPass(true)
-                .budoPassDate(new Date(1514764800000L))
-                .enteredDate(new Date(1514764800000L))
-                .hasLeft(false)
-                .leftDate(null)
+                .budoPassDate(LocalDate.parse("2018-01-02"))
+                .enteredDate(LocalDate.parse("2018-01-02"))
+                .hasLeft(true)
+                .leftDate(LocalDate.parse("2018-01-03"))
                 .isPassive(false)
                 .contributionClass(
                         contributionClassRepository.save(
@@ -84,8 +86,8 @@ public class TestHelper {
                 .name("Test Seminar")
                 .place("Test Place")
                 .seminarType(SeminarType.NATIONAL)
-                .dateTo(new Date(1515283200000L))
-                .dateFrom(new Date(1515196800000L))
+                .dateTo(LocalDate.parse("2018-01-02"))
+                .dateFrom(LocalDate.parse("2018-01-02"))
                 .build();
     }
 }

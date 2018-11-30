@@ -100,9 +100,9 @@ public class SeminarMemberControllerTests {
                 .andExpect(status().isConflict());
 
         // update the previous entities
-        seminar = seminarRepository.findOne(seminar.getId());
-        member1 = memberRepository.findOne(member1.getId());
-        member2 = memberRepository.findOne(member2.getId());
+        seminar = seminarRepository.findById(seminar.getId()).orElseThrow();
+        member1 = memberRepository.findById(member1.getId()).orElseThrow();
+        member2 = memberRepository.findById(member2.getId()).orElseThrow();
 
         assertEquals(2, seminar.getMembers().size());
         assertEquals(1, member1.getSeminars().size());
@@ -139,9 +139,9 @@ public class SeminarMemberControllerTests {
                 .andExpect(status().isNotFound());
 
         // update the previous entities
-        seminar = seminarRepository.findOne(seminar.getId());
-        member1 = memberRepository.findOne(member1.getId());
-        member2 = memberRepository.findOne(member2.getId());
+        seminar = seminarRepository.findById(seminar.getId()).orElseThrow();
+        member1 = memberRepository.findById(member1.getId()).orElseThrow();
+        member2 = memberRepository.findById(member2.getId()).orElseThrow();
 
         assertEquals(1, seminar.getMembers().size());
         assertEquals(0, member1.getSeminars().size());

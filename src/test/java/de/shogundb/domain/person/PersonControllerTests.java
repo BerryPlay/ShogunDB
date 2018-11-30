@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -57,8 +57,8 @@ public class PersonControllerTests {
                 .name("Test Seminar")
                 .place("Test Place")
                 .seminarType(SeminarType.NATIONAL)
-                .dateTo(new Date(1515283200000L))
-                .dateFrom(new Date(1515196800000L))
+                .dateTo(LocalDate.parse("2018-01-02"))
+                .dateFrom(LocalDate.parse("2018-01-02"))
                 .build());
 
         Person person = personRepository.save(Person.builder()

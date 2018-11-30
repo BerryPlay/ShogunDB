@@ -1,6 +1,7 @@
 package de.shogundb.domain.person;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.shogundb.domain.BaseEntity;
 import de.shogundb.domain.graduation.Exam;
 import de.shogundb.domain.seminar.Seminar;
 import lombok.*;
@@ -16,8 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@EqualsAndHashCode
-public class Person {
+@EqualsAndHashCode(callSuper = true)
+public class Person extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

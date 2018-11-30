@@ -21,9 +21,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -95,8 +93,8 @@ public class SeminarPersonControllerTests {
                 .andExpect(status().isConflict());
 
         // get the updated entities
-        Seminar updatedSeminar = seminarRepository.findOne(seminar.getId());
-        Person updatedReferent = personRepository.findOne(referent.getId());
+        Seminar updatedSeminar = seminarRepository.findById(seminar.getId()).orElseThrow();
+        Person updatedReferent = personRepository.findById(referent.getId()).orElseThrow();
 
         // check the link between the referent and the seminar
         assertEquals(1, updatedSeminar.getReferents().size());
@@ -135,9 +133,9 @@ public class SeminarPersonControllerTests {
                 .andExpect(status().isNoContent());
 
         // update the previous entities
-        seminar = this.seminarRepository.findOne(seminar.getId());
-        referent1 = this.personRepository.findOne(referent1.getId());
-        referent2 = this.personRepository.findOne(referent2.getId());
+        seminar = this.seminarRepository.findById(seminar.getId()).orElseThrow();
+        referent1 = this.personRepository.findById(referent1.getId()).orElseThrow();
+        referent2 = this.personRepository.findById(referent2.getId()).orElseThrow();
 
         assertEquals(1, seminar.getReferents().size());
         assertEquals(referent2, seminar.getReferents().get(0));

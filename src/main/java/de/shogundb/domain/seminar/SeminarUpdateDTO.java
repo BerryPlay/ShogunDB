@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -44,7 +44,7 @@ class SeminarUpdateDTO {
      * Can't be null.
      */
     @NotNull
-    private Date dateFrom;
+    private LocalDate dateFrom;
 
     /**
      * Date of the new seminar, when the seminar ends. If the seminar is only one day long, the dateTo is the same as
@@ -52,7 +52,7 @@ class SeminarUpdateDTO {
      * Can't be null.
      */
     @NotNull
-    private Date dateTo;
+    private LocalDate dateTo;
 
     /**
      * Type of the seminar. Can be LOCAL, REGIONAL, NATION or GLOBAL.

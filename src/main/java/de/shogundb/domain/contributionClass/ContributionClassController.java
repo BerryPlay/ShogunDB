@@ -62,7 +62,7 @@ public class ContributionClassController {
                     this.contributionClassRepository.save(existing);
 
                     // delete the contribution class
-                    this.contributionClassRepository.delete(existing.getId());
+                    this.contributionClassRepository.delete(existing);
                     return ResponseEntity.noContent().build();
                 }).orElseThrow(() -> new ContributionClassNotFoundException(id));
     }

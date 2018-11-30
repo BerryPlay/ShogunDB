@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -83,7 +83,7 @@ public class ExamControllerTests {
         discipline.getGraduations().add(graduation);
 
         // create an exam and persons
-        Exam exam = examRepository.save(Exam.builder().date(new Date()).build());
+        Exam exam = examRepository.save(Exam.builder().date(LocalDate.parse("2018-01-02")).build());
         Person examiner1 = personRepository.save(Person.builder().name("Test Examiner 1").build());
         Person examiner2 = personRepository.save(Person.builder().name("Test Examiner 2").build());
 
@@ -108,7 +108,7 @@ public class ExamControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value(hasSize(1)))
                 .andExpect(jsonPath("$[0].id").value(exam.getId().intValue()))
-                .andExpect(jsonPath("$[0].date").value(exam.getDate().getTime()))
+                .andExpect(jsonPath("$[0].date").value(exam.getDate().toString()))
                 .andExpect(jsonPath("$[0].graduationMember").value(hasSize(1)))
                 .andExpect(jsonPath("$[0].graduationMember[0].id")
                         .value(graduationMember.getId().intValue()))

@@ -8,8 +8,8 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -28,7 +28,7 @@ public class Event extends BaseEntity {
     private String name;
 
     @NotNull
-    private Date date;
+    private LocalDate date;
 
     @ManyToMany(cascade = {
             CascadeType.PERSIST,

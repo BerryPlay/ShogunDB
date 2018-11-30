@@ -1,6 +1,6 @@
 package de.shogundb.domain.seminar;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
 import de.shogundb.TestHelper;
 import de.shogundb.domain.contributionClass.ContributionClassRepository;
 import de.shogundb.domain.member.Member;
@@ -22,11 +22,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 
-import static de.shogundb.TestHelper.createTestPerson;
-import static de.shogundb.TestHelper.createTestSeminar;
+import static de.shogundb.TestHelper.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.*;
@@ -80,9 +79,9 @@ public class SeminarControllerTests {
                 .andExpect(jsonPath("$[0].seminarType",
                         is(seminar1.getSeminarType().toString())))
                 .andExpect(jsonPath("$[0].dateFrom",
-                        is(seminar1.getDateFrom().getTime())))
+                        is(seminar1.getDateFrom().toString())))
                 .andExpect(jsonPath("$[0].dateTo",
-                        is(seminar1.getDateTo().getTime())))
+                        is(seminar1.getDateTo().toString())))
 
                 // test values of seminar 2
                 .andExpect(jsonPath("$[1].id").value(is(seminar2.getId().intValue())))
@@ -91,9 +90,9 @@ public class SeminarControllerTests {
                 .andExpect(jsonPath("$[1].seminarType",
                         is(seminar2.getSeminarType().toString())))
                 .andExpect(jsonPath("$[1].dateFrom",
-                        is(seminar2.getDateFrom().getTime())))
+                        is(seminar2.getDateFrom().toString())))
                 .andExpect(jsonPath("$[1].dateTo",
-                        is(seminar2.getDateTo().getTime())));
+                        is(seminar2.getDateTo().toString())));
     }
 
     @Test
@@ -108,8 +107,8 @@ public class SeminarControllerTests {
                 .name("Test Seminar")
                 .place("Test Place")
                 .seminarType(SeminarType.NATIONAL)
-                .dateFrom(new Date(1515196800000L))
-                .dateTo(new Date(1515283200000L))
+                .dateFrom(LocalDate.parse("2018-01-02"))
+                .dateTo(LocalDate.parse("2018-01-02"))
                 .members(new ArrayList<Long>() {{
                     add(member1.getId());
                     add(member2.getId());
@@ -121,13 +120,13 @@ public class SeminarControllerTests {
 
         mockMvc.perform(post("/seminar")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(TestHelper.toJson(seminar)))
+                .content(toJson(seminar)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value(is(seminar.getName())))
                 .andExpect(jsonPath("$.place").value(is(seminar.getPlace())))
                 .andExpect(jsonPath("$.seminarType").value(is(seminar.getSeminarType().toString())))
-                .andExpect(jsonPath("$.dateFrom").value(is(seminar.getDateFrom().getTime())))
-                .andExpect(jsonPath("$.dateTo").value(is(seminar.getDateTo().getTime())));
+                .andExpect(jsonPath("$.dateFrom").value(is(seminar.getDateFrom().toString())))
+                .andExpect(jsonPath("$.dateTo").value(is(seminar.getDateTo().toString())));
 
         // get the added seminar from the database
         Seminar newSeminar = seminarRepository.findAll().iterator().next();
@@ -182,8 +181,8 @@ public class SeminarControllerTests {
                 .id(seminar.getId())
                 .name("Updated Name")
                 .place("New Place")
-                .dateFrom(new Date(1515196807000L))
-                .dateTo(new Date(1215196807000L))
+                .dateFrom(LocalDate.parse("2018-01-02"))
+                .dateTo(LocalDate.parse("2018-01-02"))
                 .seminarType(SeminarType.GLOBAL)
                 .members(new ArrayList<Long>() {{
                     add(member1.getId());
@@ -194,32 +193,24 @@ public class SeminarControllerTests {
                 }})
                 .build();
 
-        // create a gson object to convert the dto to a json string
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context)
-                        -> new Date(json.getAsJsonPrimitive().getAsLong()))
-                .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (date, type, jsonSerializationContext)
-                        -> new JsonPrimitive(date.getTime()))
-                .create();
-
         mockMvc.perform(put("/seminar")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content(gson.toJson(seminarUpdateDTO)))
+                .content(toJson(seminarUpdateDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(is(seminarUpdateDTO.getId().intValue())))
                 .andExpect(jsonPath("$.name").value(is(seminarUpdateDTO.getName())))
                 .andExpect(jsonPath("$.place").value(is(seminarUpdateDTO.getPlace())))
-                .andExpect(jsonPath("$.dateFrom").value(is(seminarUpdateDTO.getDateFrom().getTime())))
-                .andExpect(jsonPath("$.dateTo").value(is(seminarUpdateDTO.getDateTo().getTime())))
+                .andExpect(jsonPath("$.dateFrom").value(is(seminarUpdateDTO.getDateFrom().toString())))
+                .andExpect(jsonPath("$.dateTo").value(is(seminarUpdateDTO.getDateTo().toString())))
                 .andExpect(jsonPath("$.seminarType").value(is(seminarUpdateDTO.getSeminarType().toString())));
 
         // update the previous entities
-        Seminar updatedSeminar = seminarRepository.findOne(seminar.getId());
-        Member updatedMember1 = memberRepository.findOne(member1.getId());
-        Member updatedMember2 = memberRepository.findOne(member2.getId());
-        Member updatedMember3 = memberRepository.findOne(member3.getId());
-        Person updatedReferent1 = personRepository.findOne(referent1.getId());
-        Person updatedReferent2 = personRepository.findOne(referent2.getId());
+        Seminar updatedSeminar = seminarRepository.findById(seminar.getId()).orElseThrow();
+        Member updatedMember1 = memberRepository.findById(member1.getId()).orElseThrow();
+        Member updatedMember2 = memberRepository.findById(member2.getId()).orElseThrow();
+        Member updatedMember3 = memberRepository.findById(member3.getId()).orElseThrow();
+        Person updatedReferent1 = personRepository.findById(referent1.getId()).orElseThrow();
+        Person updatedReferent2 = personRepository.findById(referent2.getId()).orElseThrow();
 
         /*
          * Test the links between the members and the seminar
@@ -276,9 +267,9 @@ public class SeminarControllerTests {
         assertFalse(seminarRepository.findById(seminar.getId()).isPresent());
 
         // update the previous entities
-        Member updatedMember1 = memberRepository.findOne(member1.getId());
-        Member updatedMember2 = memberRepository.findOne(member2.getId());
-        Person updatedReferent1 = personRepository.findOne(referent1.getId());
+        Member updatedMember1 = memberRepository.findById(member1.getId()).orElseThrow();
+        Member updatedMember2 = memberRepository.findById(member2.getId()).orElseThrow();
+        Person updatedReferent1 = personRepository.findById(referent1.getId()).orElseThrow();
 
         /*
          * Test the links between the members/referents and the seminar
@@ -298,8 +289,8 @@ public class SeminarControllerTests {
                 .andExpect(jsonPath("$.id").value(seminar.getId().intValue()))
                 .andExpect(jsonPath("$.name").value(seminar.getName()))
                 .andExpect(jsonPath("$.place").value(seminar.getPlace()))
-                .andExpect(jsonPath("$.dateFrom").value(seminar.getDateFrom().getTime()))
-                .andExpect(jsonPath("$.dateTo").value(seminar.getDateTo().getTime()))
+                .andExpect(jsonPath("$.dateFrom").value(seminar.getDateFrom().toString()))
+                .andExpect(jsonPath("$.dateTo").value(seminar.getDateTo().toString()))
                 .andExpect(jsonPath("$.seminarType").value(seminar.getSeminarType().toString()));
 
         // destructive test with non existing id

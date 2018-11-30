@@ -180,7 +180,7 @@ public class SeminarController {
         seminarRepository.save(seminar);
 
         // remove the seminar
-        seminarRepository.delete(seminar.getId());
+        seminarRepository.delete(seminar);
 
         return ResponseEntity.noContent().build();
     }

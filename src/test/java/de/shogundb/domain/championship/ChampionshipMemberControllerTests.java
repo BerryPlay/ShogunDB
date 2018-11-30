@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import static de.shogundb.TestHelper.createTestMember;
 import static de.shogundb.TestHelper.toJson;
@@ -65,7 +65,7 @@ public class ChampionshipMemberControllerTests {
 
         Championship championship = championshipRepository.save(Championship.builder()
                 .name("Test Championship")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         ChampionshipMember championshipMember = championshipMemberRepository.save(ChampionshipMember.builder()
@@ -94,7 +94,7 @@ public class ChampionshipMemberControllerTests {
         Member member = memberRepository.save(createTestMember(contributionClassRepository));
         Championship championship = championshipRepository.save(Championship.builder()
                 .name("Test Championship")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         ChampionshipMemberRegisterDTO championshipMemberRegisterDTO = ChampionshipMemberRegisterDTO.builder()
@@ -132,7 +132,7 @@ public class ChampionshipMemberControllerTests {
         Member member = memberRepository.save(createTestMember(contributionClassRepository));
         Championship championship = championshipRepository.save(Championship.builder()
                 .name("Test Championship")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         ChampionshipMember championshipMember = championshipMemberRepository.save(ChampionshipMember.builder()
@@ -168,7 +168,7 @@ public class ChampionshipMemberControllerTests {
         Member member = memberRepository.save(createTestMember(contributionClassRepository));
         Championship championship = championshipRepository.save(Championship.builder()
                 .name("Test Championship")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         ChampionshipMember championshipMember = ChampionshipMember.builder()

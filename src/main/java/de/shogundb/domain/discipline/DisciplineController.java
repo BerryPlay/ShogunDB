@@ -63,7 +63,7 @@ public class DisciplineController {
                                         members.getDisciplines().remove(existing);
                                         this.memberRepository.save(members);
                                     });
-                            this.disciplineRepository.delete(id);
+                            this.disciplineRepository.delete(existing);
                             return ResponseEntity.noContent().build();
                         }
                 )

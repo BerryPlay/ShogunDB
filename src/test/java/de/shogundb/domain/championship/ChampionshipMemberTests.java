@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import static de.shogundb.TestHelper.createTestMember;
 import static org.junit.Assert.assertEquals;
@@ -43,7 +43,7 @@ public class ChampionshipMemberTests {
 
         Championship championship = this.championshipRepository.save(Championship.builder()
                 .name("Test Championship")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         ChampionshipMember championshipMember = ChampionshipMember.builder()

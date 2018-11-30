@@ -5,18 +5,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Builder
 @Getter
 @Setter
-public class ExamRegisterDTO {
+class ExamRegisterDTO {
     /**
      * The date of the exam.
      */
     @NotNull
-    private Date date;
+    private LocalDate date;
 
     /**
      * All graduations (connections between a member and a graduation).

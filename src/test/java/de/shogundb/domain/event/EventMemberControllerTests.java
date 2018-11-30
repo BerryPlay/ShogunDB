@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import static de.shogundb.TestHelper.createTestMember;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -60,7 +60,7 @@ public class EventMemberControllerTests {
 
         Event event = eventRepository.save(Event.builder()
                 .name("Test Event")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         member.getEvents().add(event);
@@ -82,7 +82,7 @@ public class EventMemberControllerTests {
 
         Event event = eventRepository.save(Event.builder()
                 .name("Test Event")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -113,7 +113,7 @@ public class EventMemberControllerTests {
 
         Event event = eventRepository.save(Event.builder()
                 .name("Test Event")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         member.getEvents().add(event);

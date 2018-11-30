@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -139,10 +139,10 @@ public class ContributionClassMemberControllerTests {
                 .phoneNumber("04929 5435438")
                 .mobileNumber("1522 416845575")
                 .email("max@muster.de")
-                .dateOfBirth(new Date(810086400000L))
+                .dateOfBirth(LocalDate.parse("1005-03-09"))
                 .hasBudoPass(true)
-                .budoPassDate(new Date(1514764800000L))
-                .enteredDate(new Date(1514764800000L))
+                .budoPassDate(LocalDate.parse("2018-01-02"))
+                .enteredDate(LocalDate.parse("2018-01-02"))
                 .hasLeft(false)
                 .leftDate(null)
                 .isPassive(false)

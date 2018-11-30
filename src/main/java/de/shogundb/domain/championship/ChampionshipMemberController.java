@@ -101,7 +101,7 @@ public class ChampionshipMemberController {
         championshipMember.getChampionship().getMembers().remove(championshipMember);
 
         this.championshipMemberRepository.save(championshipMember);
-        this.championshipMemberRepository.delete(id);
+        this.championshipMemberRepository.delete(championshipMember);
 
         return ResponseEntity.noContent().build();
     }

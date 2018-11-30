@@ -18,9 +18,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import static de.shogundb.TestHelper.createTestMember;
@@ -63,7 +63,7 @@ public class EventControllerTests {
     public void all_events_can_be_called() throws Exception {
         Event event = Event.builder()
                 .name("Test Event")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build();
 
         event = eventRepository.save(event);
@@ -73,14 +73,14 @@ public class EventControllerTests {
                 .andExpect(jsonPath("$").value(hasSize(1)))
                 .andExpect(jsonPath("$[0].id").value(is(event.getId().intValue())))
                 .andExpect(jsonPath("$[0].name").value(is(event.getName())))
-                .andExpect(jsonPath("$[0].date").value(is(event.getDate().getTime())));
+                .andExpect(jsonPath("$[0].date").value(is(event.getDate().toString())));
     }
 
     @Test
     public void event_can_be_added() throws Exception {
         Event event = Event.builder()
                 .name("Test Event")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build();
 
         List<Long> members = new ArrayList<>();
@@ -97,7 +97,7 @@ public class EventControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(notNullValue()))
                 .andExpect(jsonPath("$.name").value(is(event.getName())))
-                .andExpect(jsonPath("$.date").value(is(event.getDate().getTime())));
+                .andExpect(jsonPath("$.date").value(is(event.getDate().toString())));
 
         final Member finalMember = memberRepository.findById(member.getId()).orElseThrow(MemberNotFoundException::new);
 
@@ -125,11 +125,11 @@ public class EventControllerTests {
     public void event_can_be_updated() throws Exception {
         Event event = eventRepository.save(Event.builder()
                 .name("Test Event")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         event.setName("Updated Event");
-        event.setDate(new Date(810086400000L));
+        event.setDate(LocalDate.parse("2018-01-02"));
 
         List<Long> members = new ArrayList<>();
         Member member = memberRepository.save(createTestMember(contributionClassRepository));
@@ -146,14 +146,14 @@ public class EventControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(is(event.getId().intValue())))
                 .andExpect(jsonPath("$.name").value(is(event.getName())))
-                .andExpect(jsonPath("$.date").value(is(event.getDate().getTime())));
+                .andExpect(jsonPath("$.date").value(is(event.getDate().toString())));
 
         event = eventRepository.findById(event.getId()).orElseThrow(EventNotFoundException::new);
         member = memberRepository.findById(member.getId()).orElseThrow(MemberNotFoundException::new);
 
         assertEquals(member.getId(), event.getMembers().get(0).getId());
         assertEquals("Updated Event", event.getName());
-        assertEquals(new Date(810086400000L), event.getDate());
+        assertEquals(LocalDate.parse("2018-01-02"), event.getDate());
         assertEquals(1, event.getMembers().size());
         assertTrue(event.getMembers().contains(member));
         assertEquals(1, member.getEvents().size());
@@ -164,7 +164,7 @@ public class EventControllerTests {
     public void event_can_be_deleted() throws Exception {
         Event event = eventRepository.save(Event.builder()
                 .name("Test Event")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         Member member1 = memberRepository.save(createTestMember(contributionClassRepository));
@@ -197,14 +197,14 @@ public class EventControllerTests {
     public void event_can_be_called_by_id() throws Exception {
         Event event = eventRepository.save(Event.builder()
                 .name("Test Event")
-                .date(new Date(1514764800000L))
+                .date(LocalDate.parse("2018-01-02"))
                 .build());
 
         mockMvc.perform(get("/event/" + event.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(is(event.getId().intValue())))
                 .andExpect(jsonPath("$.name").value(is(event.getName())))
-                .andExpect(jsonPath("$.date").value(is(event.getDate().getTime())));
+                .andExpect(jsonPath("$.date").value(is(event.getDate().toString())));
 
         mockMvc.perform(get("/event/-1"))
                 .andExpect(status().isConflict());

@@ -117,6 +117,8 @@ public class ContributionClassControllerTests {
         contributionClass.setBaseContribution(45.32);
         contributionClass.setAdditionalContribution(10.45);
 
+        System.out.println(toJson(contributionClass));
+
         mockMvc.perform(put("/contributionClass")
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(toJson(contributionClass)))
