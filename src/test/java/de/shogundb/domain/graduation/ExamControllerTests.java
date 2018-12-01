@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,9 +23,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
+import static de.shogundb.TestHelper.toJson;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -72,13 +79,7 @@ public class ExamControllerTests {
 
         // create a discipline and a graduation
         Discipline discipline = disciplineRepository.save(Discipline.builder().name("Discipline").build());
-        Graduation graduation = graduationRepository.save(Graduation.builder()
-                .name("Test Graduation")
-                .discipline(discipline)
-                .examConditions("")
-                .highlightConditions("")
-                .color("RED")
-                .build());
+        Graduation graduation = graduationRepository.save(TestHelper.createTestGraduation());
 
         discipline.getGraduations().add(graduation);
 
@@ -115,5 +116,86 @@ public class ExamControllerTests {
                 .andExpect(jsonPath("$[0].examiners").value(hasSize(2)))
                 .andExpect(jsonPath("$[0].examiners[0].id").value(examiner1.getId().intValue()))
                 .andExpect(jsonPath("$[0].examiners[1].id").value(examiner2.getId().intValue()));
+    }
+
+    @Test
+    public void exam_can_be_added() throws Exception {
+        // create members
+        var member1 = memberRepository.save(TestHelper.createTestMember(contributionClassRepository));
+        var member2 = memberRepository.save(TestHelper.createTestMember(contributionClassRepository));
+
+        // create examiners
+        var examiner1 = personRepository.save(Person.builder().name("Examiner 1").build());
+        var examiner2 = personRepository.save(Person.builder().name("Examiner 2").build());
+
+        // create a discipline and a linked graduation
+        var discipline = disciplineRepository.save(Discipline.builder()
+                .name("Test Discipline")
+                .members(new ArrayList<>() {{
+                    add(member1);
+                    add(member2);
+                }})
+                .build());
+
+        var graduation = TestHelper.createTestGraduation();
+        discipline.getGraduations().add(graduation);
+        graduation.setDiscipline(discipline);
+        var savedGraduation = graduationRepository.save(graduation);
+
+        var newExam = ExamRegisterDTO.builder()
+                .date(LocalDate.parse("2018-01-02"))
+                .examiners(new ArrayList<>() {{
+                    add(examiner1.getId());
+                    add(examiner2.getId());
+                }})
+                .graduationMember(new ArrayList<>() {{
+                    add(GraduationMemberRegisterDTO.builder()
+                            .memberId(member1.getId())
+                            .graduationId(savedGraduation.getId())
+                            .build());
+                    add(GraduationMemberRegisterDTO.builder()
+                            .memberId(member2.getId())
+                            .graduationId(savedGraduation.getId())
+                            .build());
+                }})
+                .build();
+
+        // perform a mock post request
+        mockMvc.perform(post("/exam")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(toJson(newExam)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.date").value(is(newExam.getDate().toString())))
+                .andExpect(jsonPath("$.examiners").value(hasSize(2)))
+                .andExpect(jsonPath("$.examiners[0].id").value(is(examiner1.getId().intValue())))
+                .andExpect(jsonPath("$.examiners[0].name").value(is(examiner1.getName())))
+                .andExpect(jsonPath("$.examiners[1].id").value(is(examiner2.getId().intValue())))
+                .andExpect(jsonPath("$.examiners[1].name").value(is(examiner2.getName())))
+                .andExpect(jsonPath("$.graduationMember").value(hasSize(2)));
+
+        // fetch the changed entities from the database
+        var updatedMember1 = memberRepository.findById(member1.getId()).orElseThrow();
+        var updatedMember2 = memberRepository.findById(member2.getId()).orElseThrow();
+
+        var updatedDiscipline = disciplineRepository.findById(discipline.getId()).orElseThrow();
+        var updatedGraduation = graduationRepository.findById(graduation.getId()).orElseThrow();
+
+        var createdExam = examRepository.findAll().iterator().next();
+
+        // check if the exam exists
+        assertNotNull(createdExam);
+
+        assertEquals(1, updatedMember1.getGraduations().size());
+        assertEquals(discipline, updatedMember1.getGraduations().get(0).getGraduation().getDiscipline());
+        assertEquals(1, updatedMember2.getGraduations().size());
+        assertEquals(discipline, updatedMember2.getGraduations().get(0).getGraduation().getDiscipline());
+
+        assertEquals(2, updatedDiscipline.getGraduations().get(0).getGraduationMembers().size());
+        assertEquals(member1, discipline.getGraduations().get(0).getGraduationMembers().get(0).getMember());
+        assertEquals(member2, discipline.getGraduations().get(0).getGraduationMembers().get(1).getMember());
+
+        assertEquals(discipline, updatedGraduation.getGraduationMembers().get(0).getGraduation().getDiscipline());
+
+        assertEquals(createdExam, createdExam.getGraduationMember().get(0).getExam());
     }
 }

@@ -1,8 +1,12 @@
 package de.shogundb;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 import de.shogundb.domain.contributionClass.ContributionClass;
 import de.shogundb.domain.contributionClass.ContributionClassRepository;
+import de.shogundb.domain.graduation.Graduation;
 import de.shogundb.domain.member.Gender;
 import de.shogundb.domain.member.Member;
 import de.shogundb.domain.person.Person;
@@ -11,7 +15,6 @@ import de.shogundb.domain.seminar.SeminarType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class TestHelper {
     /**
@@ -88,6 +91,20 @@ public class TestHelper {
                 .seminarType(SeminarType.NATIONAL)
                 .dateTo(LocalDate.parse("2018-01-02"))
                 .dateFrom(LocalDate.parse("2018-01-02"))
+                .build();
+    }
+
+    /**
+     * Creates a new graduation.
+     *
+     * @return a new graduation
+     */
+    public static Graduation createTestGraduation() {
+        return Graduation.builder()
+                .name("Test Graduation")
+                .examConditions("")
+                .highlightConditions("")
+                .color("RED")
                 .build();
     }
 }
