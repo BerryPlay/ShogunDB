@@ -152,6 +152,6 @@ public class DisciplineControllerTests {
                 .andExpect(jsonPath("$.name").value(is(discipline.getName())));
 
         mockMvc.perform(get("/discipline/-1"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 }

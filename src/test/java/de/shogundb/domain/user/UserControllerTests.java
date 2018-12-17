@@ -127,7 +127,7 @@ public class UserControllerTests {
 
         // test with a non existing user
         mockMvc.perform(get("/user/-1"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 
     @Test

@@ -5,6 +5,7 @@ import de.shogundb.domain.championship.ChampionshipNotFoundException;
 import de.shogundb.domain.contributionClass.ContributionClassNotFoundException;
 import de.shogundb.domain.discipline.DisciplineNotFoundException;
 import de.shogundb.domain.event.EventNotFoundException;
+import de.shogundb.domain.graduation.ExamNotFoundException;
 import de.shogundb.domain.graduation.GraduationNotFoundException;
 import de.shogundb.domain.member.MemberNotFoundException;
 import de.shogundb.domain.person.PersonNotFoundException;
@@ -18,38 +19,43 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class ControllerAdviceConfig extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ChampionshipNotFoundException.class)
-    public ResponseEntity<String> handleChampionshipNotFoundException(ChampionshipNotFoundException e) {
-        return ResponseEntity.status(409).body("Championship does not exist!");
+    public ResponseEntity<?> handleChampionshipNotFoundException(ChampionshipNotFoundException e) {
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(ChampionshipMemberNotFoundException.class)
-    public ResponseEntity<String> handleChampionshipMemberNotFoundException(ChampionshipMemberNotFoundException e) {
-        return ResponseEntity.status(409).body("Championship member association does not exist!");
+    public ResponseEntity<?> handleChampionshipMemberNotFoundException(ChampionshipMemberNotFoundException e) {
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(ContributionClassNotFoundException.class)
-    public ResponseEntity<String> handleContributionClassNotFoundException(ContributionClassNotFoundException e) {
-        return ResponseEntity.status(409).body("Contribution class does not exist!");
+    public ResponseEntity<?> handleContributionClassNotFoundException(ContributionClassNotFoundException e) {
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(DisciplineNotFoundException.class)
-    public ResponseEntity<String> handleDisciplineNotFoundException(DisciplineNotFoundException e) {
-        return ResponseEntity.status(409).body("Discipline does not exist!");
+    public ResponseEntity<?> handleDisciplineNotFoundException(DisciplineNotFoundException e) {
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(EventNotFoundException.class)
-    public ResponseEntity<String> handleEventNotFoundException(EventNotFoundException e) {
-        return ResponseEntity.status(409).body("Event does not exist!");
+    public ResponseEntity<?> handleEventNotFoundException(EventNotFoundException e) {
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(ExamNotFoundException.class)
+    public ResponseEntity<?> handleExamNotFoundException(ExamNotFoundException e) {
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(GraduationNotFoundException.class)
-    public ResponseEntity<String> handleGraduationNotFoundException(GraduationNotFoundException e) {
-        return ResponseEntity.status(409).body("Graduation does not exist!");
+    public ResponseEntity<?> handleGraduationNotFoundException(GraduationNotFoundException e) {
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(MemberNotFoundException.class)
-    public ResponseEntity<String> handleContributionClassNotFoundException(MemberNotFoundException e) {
-        return ResponseEntity.status(409).body("Member does not exist!");
+    public ResponseEntity<?> handleMemberNotFoundException(MemberNotFoundException e) {
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(PersonNotFoundException.class)
@@ -58,8 +64,8 @@ public class ControllerAdviceConfig extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(SecurityException.class)
-    public ResponseEntity<String> handleSecurityException(SecurityException e) {
-        return ResponseEntity.status(409).body("Incorrect auth header present");
+    public ResponseEntity<?> handleSecurityException(SecurityException e) {
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(SeminarNotFoundException.class)
@@ -68,7 +74,7 @@ public class ControllerAdviceConfig extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e) {
-        return ResponseEntity.status(409).body("User does not exist!");
+    public ResponseEntity<?> handleUserNotFoundException(UserNotFoundException e) {
+        return ResponseEntity.notFound().build();
     }
 }

@@ -12,10 +12,11 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
-class ExamRegisterDTO {
+public class ExamUpdateDTO {
     /**
      * The unique identifier of the exam (only set if it already exists in the database).
      */
+    @NotNull
     private Long id;
 
     /**

@@ -193,6 +193,6 @@ public class ChampionshipMemberControllerTests {
         assertEquals(0, championship.getMembers().size());
 
         mockMvc.perform(delete("/championship/member/" + championshipMember.getId()))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 }

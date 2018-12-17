@@ -118,7 +118,7 @@ public class EventControllerTests {
                         .date(event.getDate())
                         .members(Collections.singletonList(-1L))
                         .build())))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -190,7 +190,7 @@ public class EventControllerTests {
         assertEquals(0, member2.getEvents().size());
 
         mockMvc.perform(delete("/event/-1"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -207,6 +207,6 @@ public class EventControllerTests {
                 .andExpect(jsonPath("$.date").value(is(event.getDate().toString())));
 
         mockMvc.perform(get("/event/-1"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 }

@@ -73,7 +73,7 @@ public class EventMemberControllerTests {
                 .andExpect(jsonPath("$[0].id").value(is(member.getId().intValue())));
 
         mockMvc.perform(get("/event/member/-1"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 
     @Test

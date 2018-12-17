@@ -242,15 +242,15 @@ public class MemberControllerTests {
 
         member = memberRepository.save(member);
 
-        List<Long> disciplines = new ArrayList<Long>() {{
+        List<Long> disciplines = new ArrayList<>() {{
             add(discipline2.getId());
         }};
 
-        List<Long> events = new ArrayList<Long>() {{
+        List<Long> events = new ArrayList<>() {{
             add(event2.getId());
         }};
 
-        List<Long> seminars = new ArrayList<Long>() {{
+        List<Long> seminars = new ArrayList<>() {{
             add(seminar2.getId());
         }};
 
@@ -367,7 +367,7 @@ public class MemberControllerTests {
         mockMvc.perform(put("/member")
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(memberJson))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -437,7 +437,7 @@ public class MemberControllerTests {
 
         // test with not existing member
         mockMvc.perform(delete("/member/0"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 
     @Test

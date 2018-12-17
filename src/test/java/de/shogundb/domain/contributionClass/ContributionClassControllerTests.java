@@ -133,7 +133,7 @@ public class ContributionClassControllerTests {
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(toJson(contributionClass)
                         .replace("\"id\":" + contributionClass.getId(), "\"id\":-1")))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -151,7 +151,7 @@ public class ContributionClassControllerTests {
         assertFalse(contributionClassRepository.findById(contributionClass.getId()).isPresent());
 
         mockMvc.perform(delete("/contributionClass/-1"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -172,6 +172,6 @@ public class ContributionClassControllerTests {
                         .value(is(contributionClass.getAdditionalContribution())));
 
         mockMvc.perform(get("/contributionClass/-1"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 }

@@ -93,7 +93,7 @@ public class DisciplineGraduationControllerTests {
                 .andExpect(jsonPath("$[1].highlightConditions").value(is(graduation2.getHighlightConditions())));
 
         mockMvc.perform(get("/discipline/graduation/-1"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 
     @Test

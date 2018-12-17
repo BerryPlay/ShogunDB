@@ -1,5 +1,6 @@
 package de.shogundb.domain.graduation;
 
+import ch.qos.logback.core.encoder.EchoEncoder;
 import de.shogundb.domain.member.MemberNotFoundException;
 import de.shogundb.domain.member.MemberRepository;
 import de.shogundb.domain.person.Person;
@@ -95,13 +96,77 @@ public class ExamController {
             graduationMember.getGraduation().getGraduationMembers().add(graduationMember);
         });
 
-        // save the exam
-        var savedExam = examRepository.save(newExam);
+        return saveExam(newExam);
+    }
 
-        URI uri = MvcUriComponentsBuilder.fromController(getClass()).path("/{id}")
-                .buildAndExpand(savedExam.getId()).toUri();
+    /**
+     * Updates the given exam.
+     *
+     * @param examUpdateDTO the new values and links of the exam
+     * @return a HTTP 201 CREATED if the exam was updated successfully
+     * @throws ExamNotFoundException       thrown, if the exam does not exist
+     * @throws PersonNotFoundException     thrown, if one of the examiners does not exist
+     * @throws MemberNotFoundException     thrown, if one of the members does not exist
+     * @throws GraduationNotFoundException thrown, if one of the graduations does not exist
+     */
+    @PutMapping
+    public ResponseEntity<Exam> update(@RequestBody @Valid ExamUpdateDTO examUpdateDTO)
+            throws ExamNotFoundException, PersonNotFoundException, MemberNotFoundException, GraduationNotFoundException {
+        // fetch the exam from the database
+        var existingExam = examRepository.findById(examUpdateDTO.getId())
+                .orElseThrow(() -> new ExamNotFoundException(examUpdateDTO.getId()));
 
-        return ResponseEntity.created(uri).body(savedExam);
+        // update the date
+        existingExam.setDate(examUpdateDTO.getDate());
+
+        // renew links between the examiner and the exam
+        existingExam.getExaminers().forEach(examiner -> examiner.getExams().remove(existingExam));
+        existingExam.getExaminers().clear();
+
+        for (var examinerId : examUpdateDTO.getExaminers()) {
+            // fetch the person from the database
+            var examiner = personRepository.findById(examinerId)
+                    .orElseThrow(() -> new PersonNotFoundException(examinerId));
+
+            // add the exam to the examiner
+            examiner.getExams().add(existingExam);
+
+            // add the examiner to the exam
+            existingExam.getExaminers().add(examiner);
+        }
+
+        // renew the graduation member connections
+        var graduationMembers = new ArrayList<GraduationMember>() {{
+            for (var graduationMember : examUpdateDTO.getGraduationMember()) {
+                // fetch the member
+                var member = memberRepository.findById(graduationMember.getMemberId())
+                        .orElseThrow(() -> new MemberNotFoundException(graduationMember.getMemberId()));
+
+                // fetch the graduation
+                var graduation = graduationRepository.findById(graduationMember.getGraduationId())
+                        .orElseThrow(() -> new GraduationNotFoundException(graduationMember.getGraduationId()));
+
+                // create the graduation member connection and add it to the list
+                var newGraduationMember = GraduationMember.builder()
+                        .member(member)
+                        .graduation(graduation)
+                        .build();
+                member.getGraduations().add(newGraduationMember);
+                graduation.getGraduationMembers().add(newGraduationMember);
+
+                add(newGraduationMember);
+            }
+        }};
+        removeGraduationMembers(existingExam);
+
+        // add all new graduation member connections to the exam
+        for (var graduationMember : graduationMembers) {
+            graduationMember.setExam(existingExam);
+            existingExam.getGraduationMember().add(graduationMember);
+        }
+        existingExam.setGraduationMember(graduationMembers);
+
+        return saveExam(existingExam);
     }
 
     /**
@@ -113,13 +178,26 @@ public class ExamController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) throws ExamNotFoundException {
-        Exam exam = examRepository.findById(id).orElseThrow(() -> new ExamNotFoundException(id));
+        var exam = examRepository.findById(id).orElseThrow(() -> new ExamNotFoundException(id));
 
         // unlink all examiners
         exam.getExaminers().forEach(examiner -> examiner.getExams().remove(exam));
         exam.getExaminers().clear();
 
         // remove all graduation member links
+        removeGraduationMembers(exam);
+
+        examRepository.delete(exam);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Unlinks and removes all graduation members from the given exam.
+     *
+     * @param exam the exam
+     */
+    private void removeGraduationMembers(Exam exam) {
         exam.getGraduationMember().forEach(graduationMember -> {
             // unlink the member
             graduationMember.getMember().getGraduations().remove(graduationMember);
@@ -131,9 +209,20 @@ public class ExamController {
             graduationMemberRepository.delete(graduationMember);
         });
         exam.getGraduationMember().clear();
+    }
 
-        examRepository.delete(exam);
+    /**
+     * Saves the given exam to the database, creates an uri and returns a HTTP 201 CREATED.
+     *
+     * @param exam the exam to save
+     * @return a HTTP 201 CREATED if the exam was successfully saved to the database
+     */
+    private ResponseEntity<Exam> saveExam(Exam exam) {
+        var updatedExam = examRepository.save(exam);
 
-        return ResponseEntity.noContent().build();
+        URI uri = MvcUriComponentsBuilder.fromController(getClass()).path("/{id}")
+                .buildAndExpand(updatedExam.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(updatedExam);
     }
 }

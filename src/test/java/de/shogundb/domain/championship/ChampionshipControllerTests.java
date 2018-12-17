@@ -220,7 +220,7 @@ public class ChampionshipControllerTests {
         assertEquals(0, championshipMemberRepository.count());
 
         mockMvc.perform(delete("/championship/-1"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -237,6 +237,6 @@ public class ChampionshipControllerTests {
                 .andExpect(jsonPath("$.date", is(championship.getDate().toString())));
 
         mockMvc.perform(get("/championship/-1"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 }
