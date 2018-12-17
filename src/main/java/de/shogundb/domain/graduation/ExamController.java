@@ -19,13 +19,20 @@ import java.util.ArrayList;
 public class ExamController {
     private final ExamRepository examRepository;
     private final GraduationRepository graduationRepository;
+    private final GraduationMemberRepository graduationMemberRepository;
     private final MemberRepository memberRepository;
     private final PersonRepository personRepository;
 
     @Autowired
-    public ExamController(ExamRepository examRepository, GraduationRepository graduationRepository, MemberRepository memberRepository, PersonRepository personRepository) {
+    public ExamController(
+            ExamRepository examRepository,
+            GraduationMemberRepository graduationMemberRepository,
+            GraduationRepository graduationRepository,
+            MemberRepository memberRepository,
+            PersonRepository personRepository) {
         this.examRepository = examRepository;
         this.graduationRepository = graduationRepository;
+        this.graduationMemberRepository = graduationMemberRepository;
         this.memberRepository = memberRepository;
         this.personRepository = personRepository;
     }
@@ -95,5 +102,38 @@ public class ExamController {
                 .buildAndExpand(savedExam.getId()).toUri();
 
         return ResponseEntity.created(uri).body(savedExam);
+    }
+
+    /**
+     * Removes the exam with the given id from the database.
+     *
+     * @param id the unique identifier of the exam
+     * @return a HTTP 204 NO CONTENT if the exam was removed successfully
+     * @throws ExamNotFoundException thrown, if an exam with the given id does not exist
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) throws ExamNotFoundException {
+        Exam exam = examRepository.findById(id).orElseThrow(() -> new ExamNotFoundException(id));
+
+        // unlink all examiners
+        exam.getExaminers().forEach(examiner -> examiner.getExams().remove(exam));
+        exam.getExaminers().clear();
+
+        // remove all graduation member links
+        exam.getGraduationMember().forEach(graduationMember -> {
+            // unlink the member
+            graduationMember.getMember().getGraduations().remove(graduationMember);
+
+            // unlink the graduation
+            graduationMember.getGraduation().getGraduationMembers().remove(graduationMember);
+
+            // remove the graduation member
+            graduationMemberRepository.delete(graduationMember);
+        });
+        exam.getGraduationMember().clear();
+
+        examRepository.delete(exam);
+
+        return ResponseEntity.noContent().build();
     }
 }
