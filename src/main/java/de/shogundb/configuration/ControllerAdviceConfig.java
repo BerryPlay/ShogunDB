@@ -6,6 +6,7 @@ import de.shogundb.domain.contributionClass.ContributionClassNotFoundException;
 import de.shogundb.domain.discipline.DisciplineNotFoundException;
 import de.shogundb.domain.event.EventNotFoundException;
 import de.shogundb.domain.exam.ExamNotFoundException;
+import de.shogundb.domain.graduation.GraduationMemberNotFoundException;
 import de.shogundb.domain.graduation.GraduationNotFoundException;
 import de.shogundb.domain.member.MemberNotFoundException;
 import de.shogundb.domain.person.PersonNotFoundException;
@@ -50,6 +51,11 @@ public class ControllerAdviceConfig extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(GraduationNotFoundException.class)
     public ResponseEntity<?> handleGraduationNotFoundException(GraduationNotFoundException e) {
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(GraduationMemberNotFoundException.class)
+    public ResponseEntity<?> handleGraduationMemberNotFoundException(GraduationMemberNotFoundException e) {
         return ResponseEntity.notFound().build();
     }
 

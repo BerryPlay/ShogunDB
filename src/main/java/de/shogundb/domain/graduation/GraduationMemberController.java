@@ -41,6 +41,15 @@ public class GraduationMemberController {
         return ResponseEntity.ok(graduationMemberRepository.findAll());
     }
 
+    /**
+     * Adds a new  exam to the database and links all given members, persons and graduations to it.
+     *
+     * @param graduationMember a data transfer object to add a link between
+     * @return a HTTP 201 CREATED if the link was set successfully
+     * @throws ExamNotFoundException       thrown, if the exam with the given id does not exists
+     * @throws MemberNotFoundException     thrown, if the member with the given id does not exists
+     * @throws GraduationNotFoundException thrown, if the graduation with the given id does not exists
+     */
     @PostMapping
     public ResponseEntity<GraduationMember> store(@RequestBody GraduationMemberRegisterDTO graduationMember)
             throws ExamNotFoundException, MemberNotFoundException, GraduationNotFoundException {
@@ -75,5 +84,28 @@ public class GraduationMemberController {
                 .buildAndExpand(newGraduationMember.getId()).toUri();
 
         return ResponseEntity.created(uri).body(newGraduationMember);
+    }
+
+    /**
+     * Removes the graduation member link with the given id.
+     *
+     * @param id the unique identifier of the graduation member link
+     * @return a HTTP 204 NO CONTENT if the graduation member link was removed successfully
+     * @throws GraduationMemberNotFoundException thrown, if the graduation member link with the given id does not exists
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) throws GraduationMemberNotFoundException {
+        var graduationMember = graduationMemberRepository.findById(id)
+                .orElseThrow(() -> new GraduationMemberNotFoundException(id));
+
+        // unlink all
+        graduationMember.getExam().getGraduationMembers().remove(graduationMember);
+        graduationMember.getGraduation().getGraduationMembers().remove(graduationMember);
+        graduationMember.getMember().getGraduations().remove(graduationMember);
+
+        // delete the link in the database
+        graduationMemberRepository.delete(graduationMember);
+
+        return ResponseEntity.noContent().build();
     }
 }

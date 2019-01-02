@@ -28,9 +28,9 @@ import java.time.LocalDate;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -174,5 +174,58 @@ public class GraduationMemberTests {
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(TestHelper.toJson(graduationMember)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void graduation_member_link_can_be_removed() throws Exception {
+        // create member
+        Member member = TestHelper.createTestMember(contributionClassRepository);
+
+        // create a discipline and a graduation
+        Discipline discipline = disciplineRepository.save(Discipline.builder().name("Discipline").build());
+        Graduation graduation = graduationRepository.save(TestHelper.createTestGraduation());
+
+        discipline.getGraduations().add(graduation);
+
+        // create an exam and persons
+        Exam exam = examRepository.save(Exam.builder().date(LocalDate.parse("2018-01-02")).build());
+        Person examiner1 = personRepository.save(Person.builder().name("Test Examiner 1").build());
+        Person examiner2 = personRepository.save(Person.builder().name("Test Examiner 2").build());
+
+        exam.getExaminers().add(examiner1);
+        exam.getExaminers().add(examiner2);
+        examiner1.getExams().add(exam);
+        examiner2.getExams().add(exam);
+
+        // create a graduation member connection
+        GraduationMember graduationMember = GraduationMember.builder()
+                .exam(exam)
+                .graduation(graduation)
+                .member(member)
+                .build();
+        exam.getGraduationMembers().add(graduationMember);
+        graduation.getGraduationMembers().add(graduationMember);
+        member.getGraduations().add(graduationMember);
+
+        graduationMember = graduationMemberRepository.save(graduationMember);
+
+        mockMvc.perform(delete("/graduationMember/" + graduationMember.getId()))
+                .andExpect(status().isNoContent());
+
+        // update the entities
+        var updatedMember = memberRepository.findById(member.getId()).orElseThrow();
+        var updatedGraduation = graduationRepository.findById(graduation.getId()).orElseThrow();
+        var updatedExam = examRepository.findById(exam.getId()).orElseThrow();
+
+        // check if the graduation member link was removed successfully
+        assertFalse(graduationMemberRepository.existsById(graduationMember.getId()));
+
+        // check if the links are removed from the other entities
+        assertEquals(0, updatedMember.getGraduations().size());
+        assertEquals(0, updatedGraduation.getGraduationMembers().size());
+        assertEquals(0, updatedExam.getGraduationMembers().size());
+
+        // destructive testing with not existing id
+        mockMvc.perform(delete("/graduationMember/-1")).andExpect(status().isNotFound());
     }
 }
