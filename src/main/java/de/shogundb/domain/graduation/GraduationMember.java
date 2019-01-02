@@ -2,6 +2,7 @@ package de.shogundb.domain.graduation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.shogundb.domain.member.Member;
+import de.shogundb.domain.exam.Exam;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

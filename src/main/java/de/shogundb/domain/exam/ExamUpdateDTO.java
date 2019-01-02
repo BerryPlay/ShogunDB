@@ -1,5 +1,6 @@
-package de.shogundb.domain.graduation;
+package de.shogundb.domain.exam;
 
+import de.shogundb.domain.graduation.GraduationMemberRegisterDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +30,7 @@ public class ExamUpdateDTO {
      * All graduations (connections between a member and a graduation).
      */
     @Builder.Default
-    private List<GraduationMemberRegisterDTO> graduationMember = new ArrayList<>();
+    private List<GraduationMemberRegisterDTO> graduationMembers = new ArrayList<>();
 
     /**
      * A list with the ids of all examiners (persons).

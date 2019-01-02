@@ -1,4 +1,4 @@
-package de.shogundb.domain.graduation;
+package de.shogundb.domain.exam;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 

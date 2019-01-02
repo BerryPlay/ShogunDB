@@ -1,6 +1,9 @@
-package de.shogundb.domain.graduation;
+package de.shogundb.domain.exam;
 
-import ch.qos.logback.core.encoder.EchoEncoder;
+import de.shogundb.domain.graduation.GraduationMember;
+import de.shogundb.domain.graduation.GraduationMemberRepository;
+import de.shogundb.domain.graduation.GraduationNotFoundException;
+import de.shogundb.domain.graduation.GraduationRepository;
 import de.shogundb.domain.member.MemberNotFoundException;
 import de.shogundb.domain.member.MemberRepository;
 import de.shogundb.domain.person.Person;
@@ -74,7 +77,7 @@ public class ExamController {
 
         // create all graduation member exam links
         var graduationMembers = new ArrayList<GraduationMember>() {{
-            for (var graduationMemberDTO : exam.getGraduationMember()) {
+            for (var graduationMemberDTO : exam.getGraduationMembers()) {
                 add(GraduationMember.builder()
                         .member(memberRepository
                                 .findById(graduationMemberDTO.getMemberId())
@@ -88,10 +91,10 @@ public class ExamController {
             }
         }};
 
-        newExam.setGraduationMember(graduationMembers);
+        newExam.setGraduationMembers(graduationMembers);
 
         // update the member
-        newExam.getGraduationMember().forEach(graduationMember -> {
+        newExam.getGraduationMembers().forEach(graduationMember -> {
             graduationMember.getMember().getGraduations().add(graduationMember);
             graduationMember.getGraduation().getGraduationMembers().add(graduationMember);
         });
@@ -137,7 +140,7 @@ public class ExamController {
 
         // renew the graduation member connections
         var graduationMembers = new ArrayList<GraduationMember>() {{
-            for (var graduationMember : examUpdateDTO.getGraduationMember()) {
+            for (var graduationMember : examUpdateDTO.getGraduationMembers()) {
                 // fetch the member
                 var member = memberRepository.findById(graduationMember.getMemberId())
                         .orElseThrow(() -> new MemberNotFoundException(graduationMember.getMemberId()));
@@ -162,9 +165,9 @@ public class ExamController {
         // add all new graduation member connections to the exam
         for (var graduationMember : graduationMembers) {
             graduationMember.setExam(existingExam);
-            existingExam.getGraduationMember().add(graduationMember);
+            existingExam.getGraduationMembers().add(graduationMember);
         }
-        existingExam.setGraduationMember(graduationMembers);
+        existingExam.setGraduationMembers(graduationMembers);
 
         return saveExam(existingExam);
     }
@@ -212,7 +215,7 @@ public class ExamController {
      * @param exam the exam
      */
     private void removeGraduationMembers(Exam exam) {
-        exam.getGraduationMember().forEach(graduationMember -> {
+        exam.getGraduationMembers().forEach(graduationMember -> {
             // unlink the member
             graduationMember.getMember().getGraduations().remove(graduationMember);
 
@@ -222,7 +225,7 @@ public class ExamController {
             // remove the graduation member
             graduationMemberRepository.delete(graduationMember);
         });
-        exam.getGraduationMember().clear();
+        exam.getGraduationMembers().clear();
     }
 
     /**

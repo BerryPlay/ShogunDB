@@ -11,19 +11,29 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @SpringBootApplication
 @EnableJpaAuditing
 public class ShogunDBApplication {
-	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurerAdapter() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**")
-						.allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
-						.allowedOrigins("*");
-			}
-		};
-	}
+    /**
+     * Configures the cross origin access.
+     *
+     * @return a WebMvcConfigurerAdapter to overwrite the cors configuration
+     */
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurerAdapter() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
+                        .allowedOrigins("*");
+            }
+        };
+    }
 
-	public static void main(String[] args) {
+    /**
+     * Runs the spring application.
+     *
+     * @param args the application arguments
+     */
+    public static void main(String[] args) {
         SpringApplication.run(ShogunDBApplication.class, args);
-	}
+    }
 }

@@ -2,7 +2,7 @@ package de.shogundb.domain.person;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.shogundb.domain.BaseEntity;
-import de.shogundb.domain.graduation.Exam;
+import de.shogundb.domain.exam.Exam;
 import de.shogundb.domain.seminar.Seminar;
 import lombok.*;
 

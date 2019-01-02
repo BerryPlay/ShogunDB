@@ -1,6 +1,7 @@
-package de.shogundb.domain.graduation;
+package de.shogundb.domain.exam;
 
 import de.shogundb.domain.BaseEntity;
+import de.shogundb.domain.graduation.GraduationMember;
 import de.shogundb.domain.person.Person;
 import lombok.*;
 
@@ -41,7 +42,7 @@ public class Exam extends BaseEntity {
             CascadeType.REFRESH},
             mappedBy = "exam")
     @Builder.Default
-    private List<GraduationMember> graduationMember = new ArrayList<>();
+    private List<GraduationMember> graduationMembers = new ArrayList<>();
 
     /**
      * All examiners of the exam.

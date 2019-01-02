@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-class GraduationMemberRegisterDTO {
+public class GraduationMemberRegisterDTO {
     /**
      * The unique identifier of the graduation.
      */
@@ -23,4 +23,10 @@ class GraduationMemberRegisterDTO {
      */
     @NotNull
     private Long memberId;
+
+    /**
+     * The unique identifier of the exam.
+     * Can be left blank while creating a new exam but must be set if the exam already exists.
+     */
+    private Long examId;
 }

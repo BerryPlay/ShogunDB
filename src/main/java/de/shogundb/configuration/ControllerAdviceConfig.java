@@ -5,7 +5,7 @@ import de.shogundb.domain.championship.ChampionshipNotFoundException;
 import de.shogundb.domain.contributionClass.ContributionClassNotFoundException;
 import de.shogundb.domain.discipline.DisciplineNotFoundException;
 import de.shogundb.domain.event.EventNotFoundException;
-import de.shogundb.domain.graduation.ExamNotFoundException;
+import de.shogundb.domain.exam.ExamNotFoundException;
 import de.shogundb.domain.graduation.GraduationNotFoundException;
 import de.shogundb.domain.member.MemberNotFoundException;
 import de.shogundb.domain.person.PersonNotFoundException;

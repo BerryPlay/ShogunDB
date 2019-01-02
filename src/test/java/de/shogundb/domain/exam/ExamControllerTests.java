@@ -1,9 +1,10 @@
-package de.shogundb.domain.graduation;
+package de.shogundb.domain.exam;
 
 import de.shogundb.TestHelper;
 import de.shogundb.domain.contributionClass.ContributionClassRepository;
 import de.shogundb.domain.discipline.Discipline;
 import de.shogundb.domain.discipline.DisciplineRepository;
+import de.shogundb.domain.graduation.*;
 import de.shogundb.domain.member.Member;
 import de.shogundb.domain.member.MemberRepository;
 import de.shogundb.domain.person.Person;
@@ -14,7 +15,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -98,7 +98,7 @@ public class ExamControllerTests {
                 .graduation(graduation)
                 .member(member)
                 .build();
-        exam.getGraduationMember().add(graduationMember);
+        exam.getGraduationMembers().add(graduationMember);
         graduation.getGraduationMembers().add(graduationMember);
         member.getGraduations().add(graduationMember);
 
@@ -107,14 +107,14 @@ public class ExamControllerTests {
         mockMvc.perform(get("/exam"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value(hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value(exam.getId().intValue()))
-                .andExpect(jsonPath("$[0].date").value(exam.getDate().toString()))
-                .andExpect(jsonPath("$[0].graduationMember").value(hasSize(1)))
-                .andExpect(jsonPath("$[0].graduationMember[0].id")
-                        .value(graduationMember.getId().intValue()))
+                .andExpect(jsonPath("$[0].id").value(is(exam.getId().intValue())))
+                .andExpect(jsonPath("$[0].date").value(is(exam.getDate().toString())))
+                .andExpect(jsonPath("$[0].graduationMembers").value(hasSize(1)))
+                .andExpect(jsonPath("$[0].graduationMembers[0].id")
+                        .value(is(graduationMember.getId().intValue())))
                 .andExpect(jsonPath("$[0].examiners").value(hasSize(2)))
-                .andExpect(jsonPath("$[0].examiners[0].id").value(examiner1.getId().intValue()))
-                .andExpect(jsonPath("$[0].examiners[1].id").value(examiner2.getId().intValue()));
+                .andExpect(jsonPath("$[0].examiners[0].id").value(is(examiner1.getId().intValue())))
+                .andExpect(jsonPath("$[0].examiners[1].id").value(is(examiner2.getId().intValue())));
     }
 
     @Test
@@ -147,7 +147,7 @@ public class ExamControllerTests {
                     add(examiner1.getId());
                     add(examiner2.getId());
                 }})
-                .graduationMember(new ArrayList<>() {{
+                .graduationMembers(new ArrayList<>() {{
                     add(GraduationMemberRegisterDTO.builder()
                             .memberId(member1.getId())
                             .graduationId(savedGraduation.getId())
@@ -170,7 +170,7 @@ public class ExamControllerTests {
                 .andExpect(jsonPath("$.examiners[0].name").value(is(examiner1.getName())))
                 .andExpect(jsonPath("$.examiners[1].id").value(is(examiner2.getId().intValue())))
                 .andExpect(jsonPath("$.examiners[1].name").value(is(examiner2.getName())))
-                .andExpect(jsonPath("$.graduationMember").value(hasSize(2)));
+                .andExpect(jsonPath("$.graduationMembers").value(hasSize(2)));
 
         // fetch the changed entities from the database
         var updatedMember1 = memberRepository.findById(member1.getId()).orElseThrow();
@@ -195,7 +195,7 @@ public class ExamControllerTests {
 
         assertEquals(discipline, updatedGraduation.getGraduationMembers().get(0).getGraduation().getDiscipline());
 
-        assertEquals(createdExam, createdExam.getGraduationMember().get(0).getExam());
+        assertEquals(createdExam, createdExam.getGraduationMembers().get(0).getExam());
     }
 
     @Test
@@ -228,7 +228,7 @@ public class ExamControllerTests {
                 .graduation(graduation)
                 .member(member1)
                 .build();
-        exam.getGraduationMember().add(graduationMember1);
+        exam.getGraduationMembers().add(graduationMember1);
         graduation.getGraduationMembers().add(graduationMember1);
         member1.getGraduations().add(graduationMember1);
 
@@ -237,7 +237,7 @@ public class ExamControllerTests {
                 .graduation(graduation)
                 .member(member2)
                 .build();
-        exam.getGraduationMember().add(graduationMember2);
+        exam.getGraduationMembers().add(graduationMember2);
         graduation.getGraduationMembers().add(graduationMember2);
         member2.getGraduations().add(graduationMember2);
 
@@ -255,7 +255,7 @@ public class ExamControllerTests {
                     // a new connection to add
                     add(examiner3.getId());
                 }})
-                .graduationMember(new ArrayList<>() {{
+                .graduationMembers(new ArrayList<>() {{
                     // an existing one to keep
                     add(GraduationMemberRegisterDTO.builder()
                             .graduationId(graduationMember2.getGraduation().getId())
@@ -281,7 +281,7 @@ public class ExamControllerTests {
                 .andExpect(jsonPath("$.examiners[0].name").value(is(examiner2.getName())))
                 .andExpect(jsonPath("$.examiners[1].id").value(is(examiner3.getId().intValue())))
                 .andExpect(jsonPath("$.examiners[1].name").value(is(examiner3.getName())))
-                .andExpect(jsonPath("$.graduationMember").value(hasSize(2)));
+                .andExpect(jsonPath("$.graduationMembers").value(hasSize(2)));
 
         // fetch the changed entities from the database
         var updatedMember1 = memberRepository.findById(member1.getId()).orElseThrow();
@@ -300,13 +300,13 @@ public class ExamControllerTests {
         assertEquals(0, updatedMember1.getGraduations().size());
         assertEquals(1, updatedMember2.getGraduations().size());
         assertEquals(1, updatedMember3.getGraduations().size());
-        assertEquals(2, updatedExam.getGraduationMember().size());
+        assertEquals(2, updatedExam.getGraduationMembers().size());
 
-        assertEquals(updatedMember2, updatedExam.getGraduationMember().get(0).getMember());
-        assertEquals(updatedMember3, updatedExam.getGraduationMember().get(1).getMember());
+        assertEquals(updatedMember2, updatedExam.getGraduationMembers().get(0).getMember());
+        assertEquals(updatedMember3, updatedExam.getGraduationMembers().get(1).getMember());
 
         // assert that the links between the graduation and the exams are correct
-        assertEquals(updatedGraduation, exam.getGraduationMember().get(0).getGraduation());
+        assertEquals(updatedGraduation, exam.getGraduationMembers().get(0).getGraduation());
         assertEquals(exam, updatedGraduation.getGraduationMembers().get(0).getExam());
 
         // assert that the links between the examiner and the exams are correct
@@ -330,22 +330,22 @@ public class ExamControllerTests {
         examUpdateDTO.setId(oldId);
 
         // test with not existing member
-        oldId = examUpdateDTO.getGraduationMember().get(0).getMemberId();
-        examUpdateDTO.getGraduationMember().get(0).setMemberId(-1L);
+        oldId = examUpdateDTO.getGraduationMembers().get(0).getMemberId();
+        examUpdateDTO.getGraduationMembers().get(0).setMemberId(-1L);
         mockMvc.perform(put("/exam")
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(toJson(examUpdateDTO)))
                 .andExpect(status().isNotFound());
-        examUpdateDTO.getGraduationMember().get(0).setMemberId(oldId);
+        examUpdateDTO.getGraduationMembers().get(0).setMemberId(oldId);
 
         // test with not existing graduation
-        oldId = examUpdateDTO.getGraduationMember().get(0).getGraduationId();
-        examUpdateDTO.getGraduationMember().get(0).setGraduationId(-1L);
+        oldId = examUpdateDTO.getGraduationMembers().get(0).getGraduationId();
+        examUpdateDTO.getGraduationMembers().get(0).setGraduationId(-1L);
         mockMvc.perform(put("/exam")
                 .contentType(APPLICATION_JSON_UTF8)
                 .content(toJson(examUpdateDTO)))
                 .andExpect(status().isNotFound());
-        examUpdateDTO.getGraduationMember().get(0).setGraduationId(oldId);
+        examUpdateDTO.getGraduationMembers().get(0).setGraduationId(oldId);
 
         // test with not existing examiner
         examUpdateDTO.getExaminers().set(0, -1L);
@@ -382,7 +382,7 @@ public class ExamControllerTests {
                 .graduation(graduation)
                 .member(member)
                 .build();
-        exam.getGraduationMember().add(graduationMember);
+        exam.getGraduationMembers().add(graduationMember);
         graduation.getGraduationMembers().add(graduationMember);
         member.getGraduations().add(graduationMember);
 
@@ -439,7 +439,7 @@ public class ExamControllerTests {
                 .graduation(graduation)
                 .member(member)
                 .build();
-        exam.getGraduationMember().add(graduationMember);
+        exam.getGraduationMembers().add(graduationMember);
         graduation.getGraduationMembers().add(graduationMember);
         member.getGraduations().add(graduationMember);
 
@@ -449,8 +449,8 @@ public class ExamControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(exam.getId().intValue()))
                 .andExpect(jsonPath("$.date").value(is(exam.getDate().toString())))
-                .andExpect(jsonPath("$.graduationMember").value(hasSize(1)))
-                .andExpect(jsonPath("$.graduationMember[0].id").value(is(graduationMember.getId().intValue())))
+                .andExpect(jsonPath("$.graduationMembers").value(hasSize(1)))
+                .andExpect(jsonPath("$.graduationMembers[0].id").value(is(graduationMember.getId().intValue())))
                 .andExpect(jsonPath("$.examiners").value(hasSize(2)))
                 .andExpect(jsonPath("$.examiners[0].id").value(is(examiner1.getId().intValue())))
                 .andExpect(jsonPath("$.examiners[0].name").value(is(examiner1.getName())))
