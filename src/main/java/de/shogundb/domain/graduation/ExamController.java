@@ -193,6 +193,20 @@ public class ExamController {
     }
 
     /**
+     * Shows the exam with the given id.
+     *
+     * @param id the unique identifier of the exam
+     * @return a HTTP 200 OK and the exam, if it exists in the database
+     * @throws ExamNotFoundException thrown, if no exam with the given id exists in the database
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Exam> show(@PathVariable Long id) throws ExamNotFoundException {
+        var exam = examRepository.findById(id).orElseThrow(() -> new ExamNotFoundException(id));
+
+        return ResponseEntity.ok(exam);
+    }
+
+    /**
      * Unlinks and removes all graduation members from the given exam.
      *
      * @param exam the exam

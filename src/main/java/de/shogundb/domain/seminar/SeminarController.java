@@ -193,7 +193,7 @@ public class SeminarController {
      * @throws SeminarNotFoundException thrown, if the seminar does not exist in the database
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Seminar> findById(@PathVariable Long id) throws SeminarNotFoundException {
+    public ResponseEntity<Seminar> show(@PathVariable Long id) throws SeminarNotFoundException {
         return ResponseEntity.ok(seminarRepository.findById(id).orElseThrow(() -> new SeminarNotFoundException(id)));
     }
 }

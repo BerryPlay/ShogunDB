@@ -411,4 +411,55 @@ public class ExamControllerTests {
         assertEquals(0, updatedExaminer1.getExams().size());
         assertEquals(0, updatedExaminer2.getExams().size());
     }
+
+    @Test
+    public void exam_can_be_called_by_id() throws Exception {
+        // create member
+        Member member = TestHelper.createTestMember(contributionClassRepository);
+
+        // create a discipline and a graduation
+        Discipline discipline = disciplineRepository.save(Discipline.builder().name("Discipline").build());
+        Graduation graduation = graduationRepository.save(TestHelper.createTestGraduation());
+
+        discipline.getGraduations().add(graduation);
+
+        // create an exam and persons
+        Exam exam = examRepository.save(Exam.builder().date(LocalDate.parse("2018-01-02")).build());
+        Person examiner1 = personRepository.save(Person.builder().name("Test Examiner 1").build());
+        Person examiner2 = personRepository.save(Person.builder().name("Test Examiner 2").build());
+
+        exam.getExaminers().add(examiner1);
+        exam.getExaminers().add(examiner2);
+        examiner1.getExams().add(exam);
+        examiner2.getExams().add(exam);
+
+        // create a graduation member connection
+        GraduationMember graduationMember = GraduationMember.builder()
+                .exam(exam)
+                .graduation(graduation)
+                .member(member)
+                .build();
+        exam.getGraduationMember().add(graduationMember);
+        graduation.getGraduationMembers().add(graduationMember);
+        member.getGraduations().add(graduationMember);
+
+        graduationMember = graduationMemberRepository.save(graduationMember);
+
+        mockMvc.perform(get("/exam/" + exam.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(exam.getId().intValue()))
+                .andExpect(jsonPath("$.date").value(is(exam.getDate().toString())))
+                .andExpect(jsonPath("$.graduationMember").value(hasSize(1)))
+                .andExpect(jsonPath("$.graduationMember[0].id").value(is(graduationMember.getId().intValue())))
+                .andExpect(jsonPath("$.examiners").value(hasSize(2)))
+                .andExpect(jsonPath("$.examiners[0].id").value(is(examiner1.getId().intValue())))
+                .andExpect(jsonPath("$.examiners[0].name").value(is(examiner1.getName())))
+                .andExpect(jsonPath("$.examiners[1].id").value(is(examiner2.getId().intValue())))
+                .andExpect(jsonPath("$.examiners[1].name").value(is(examiner2.getName())));
+
+        // test with non existing id
+        mockMvc.perform(get("/exam/-1")).andExpect(status().isNotFound());
+    }
+
+
 }
