@@ -1,6 +1,5 @@
 package de.shogundb.domain.member;
 
-import de.shogundb.domain.contributionClass.ContributionClass;
 import de.shogundb.domain.contributionClass.ContributionClassNotFoundException;
 import de.shogundb.domain.contributionClass.ContributionClassRepository;
 import de.shogundb.domain.discipline.Discipline;
@@ -9,6 +8,7 @@ import de.shogundb.domain.discipline.DisciplineRepository;
 import de.shogundb.domain.event.Event;
 import de.shogundb.domain.event.EventNotFoundException;
 import de.shogundb.domain.event.EventRepository;
+import de.shogundb.domain.graduation.GraduationMemberRepository;
 import de.shogundb.domain.seminar.Seminar;
 import de.shogundb.domain.seminar.SeminarNotFoundException;
 import de.shogundb.domain.seminar.SeminarRepository;
@@ -22,50 +22,67 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @RestController
 @RequestMapping("/member")
 public class MemberController {
-    private final MemberRepository memberRepository;
     private final ContributionClassRepository contributionClassRepository;
     private final DisciplineRepository disciplineRepository;
-    private final SeminarRepository seminarRepository;
     private final EventRepository eventRepository;
+    private final GraduationMemberRepository graduationMemberRepository;
+    private final MemberRepository memberRepository;
+    private final SeminarRepository seminarRepository;
 
     @Autowired
-    public MemberController(MemberRepository memberRepository, ContributionClassRepository contributionClassRepository, DisciplineRepository disciplineRepository, SeminarRepository seminarRepository, EventRepository eventRepository) {
-        this.memberRepository = memberRepository;
+    public MemberController(
+            ContributionClassRepository contributionClassRepository,
+            DisciplineRepository disciplineRepository,
+            EventRepository eventRepository,
+            GraduationMemberRepository graduationMemberRepository,
+            MemberRepository memberRepository,
+            SeminarRepository seminarRepository) {
         this.contributionClassRepository = contributionClassRepository;
         this.disciplineRepository = disciplineRepository;
-        this.seminarRepository = seminarRepository;
         this.eventRepository = eventRepository;
+        this.memberRepository = memberRepository;
+        this.graduationMemberRepository = graduationMemberRepository;
+        this.seminarRepository = seminarRepository;
     }
 
+    /**
+     * Get a list of all members in the database.
+     *
+     * @return a HTTP 200 OK and a list of all members
+     */
     @GetMapping
     public ResponseEntity<Iterable<Member>> index() {
         return ResponseEntity.ok(this.memberRepository.findAll());
     }
 
+    /**
+     * Adds a new member to the database.
+     *
+     * @param member a data transfer object with all necessary information.
+     * @return a HTTP 201 CREATED if the member was added successfully to the database.
+     * @throws ContributionClassNotFoundException thrown, if no contribution with the given id exists
+     * @throws DisciplineNotFoundException        thrown, if no discipline with the given ids exists
+     */
     @PostMapping
-    public ResponseEntity<Member> store(@RequestBody @Valid MemberRegisterDTO member) throws ContributionClassNotFoundException, DisciplineNotFoundException {
+    public ResponseEntity<Member> store(@RequestBody @Valid MemberRegisterDTO member)
+            throws ContributionClassNotFoundException, DisciplineNotFoundException {
         // setup contribution class
-        ContributionClass contributionClass = null;
-        if (member.getContributionClass() != null) {
-            contributionClass = this.contributionClassRepository.findById(member.getContributionClass())
-                    .orElseThrow(() -> new ContributionClassNotFoundException(member.getContributionClass()));
-        }
+        var contributionClass = this.contributionClassRepository.findById(member.getContributionClass())
+                .orElseThrow(() -> new ContributionClassNotFoundException(member.getContributionClass()));
 
         // setup disciplines
-        List<Discipline> disciplines = new ArrayList<>();
-        if (member.getDisciplines() != null && member.getDisciplines().size() >= 1) {
-            for (Long disciplineId : member.getDisciplines()) {
-                disciplines.add(this.disciplineRepository.findById(disciplineId)
+        var disciplines = new ArrayList<Discipline>() {{
+            for (var disciplineId : member.getDisciplines()) {
+                add(disciplineRepository.findById(disciplineId)
                         .orElseThrow(() -> new DisciplineNotFoundException(disciplineId)));
             }
-        }
+        }};
 
-        Member newMember = Member.builder()
+        var newMember = Member.builder()
                 .forename(member.getForename())
                 .surname(member.getSurname())
                 .gender(member.getGender())
@@ -81,89 +98,95 @@ public class MemberController {
                 .hasLeft(member.getHasLeft())
                 .leftDate(member.getLeftDate())
                 .isPassive(member.getIsPassive())
+                .contributionClass(contributionClass)
                 .accountHolder(member.getAccountHolder())
                 .build();
 
-        newMember = this.memberRepository.save(newMember);
+        // apply the member to the contribution class
+        contributionClass.getMembers().add(newMember);
 
-        if (contributionClass != null) {
-            newMember.setContributionClass(contributionClass);
-            contributionClass.getMembers().add(newMember);
-        }
-
-        if (disciplines.size() >= 1) {
-            for (Discipline discipline : disciplines) {
-                discipline.getMembers().add(newMember);
-            }
+        // add the member to the disciplines
+        for (var discipline : disciplines) {
+            discipline.getMembers().add(newMember);
         }
         newMember.getDisciplines().addAll(disciplines);
 
+        // save the member to the database
         newMember = this.memberRepository.save(newMember);
 
-        URI uri = MvcUriComponentsBuilder.fromController(getClass()).path("/{id}")
+        var uri = MvcUriComponentsBuilder.fromController(getClass()).path("/{id}")
                 .buildAndExpand(newMember.getId()).toUri();
 
         return ResponseEntity.created(uri).body(newMember);
     }
 
+    /**
+     * Updates an existing member in the database.
+     *
+     * @param member a data transfer object with all necessary information
+     * @return a HTTP 201 CREATED if the member was updated successfully
+     * @throws MemberNotFoundException            thrown, if no member with the given id exists
+     * @throws ContributionClassNotFoundException thrown, if no contribution class with the given id exists
+     * @throws DisciplineNotFoundException        thrown, if no discipline with the given ids exists
+     * @throws EventNotFoundException             thrown, if no event with the given ids exists
+     * @throws SeminarNotFoundException           thrown, if no seminar with the given ids exists
+     */
     @PutMapping
-    public ResponseEntity<Member> update(@RequestBody @Valid MemberUpdateDTO member) throws MemberNotFoundException, ContributionClassNotFoundException, DisciplineNotFoundException, EventNotFoundException, SeminarNotFoundException {
+    public ResponseEntity<Member> update(@RequestBody @Valid MemberUpdateDTO member) throws
+            MemberNotFoundException,
+            ContributionClassNotFoundException,
+            DisciplineNotFoundException,
+            EventNotFoundException,
+            SeminarNotFoundException {
         // get existing member from database
-        Member existingMember = this.memberRepository.findById(member.getId())
+        var existingMember = this.memberRepository.findById(member.getId())
                 .orElseThrow(() -> new MemberNotFoundException(member.getId()));
-        final Member finalMember = existingMember;
+        final var finalMember = existingMember;
 
         // setup contribution class
-        ContributionClass contributionClass = null;
-        if (member.getContributionClass() != null) {
-            contributionClass = this.contributionClassRepository.findById(member.getContributionClass())
-                    .orElseThrow(() -> new ContributionClassNotFoundException(member.getContributionClass()));
-            contributionClass.getMembers().add(existingMember);
-        }
+        var contributionClass = this.contributionClassRepository.findById(member.getContributionClass())
+                .orElseThrow(() -> new ContributionClassNotFoundException(member.getContributionClass()));
+        contributionClass.getMembers().add(existingMember);
 
         // remove member from the contribution class
-        if (existingMember.getContributionClass() != null) {
-            existingMember.getContributionClass().getMembers().remove(existingMember);
-        }
+        existingMember.getContributionClass().getMembers().remove(existingMember);
         existingMember.setContributionClass(contributionClass);
 
         // setup disciplines
-        List<Discipline> disciplines = new ArrayList<>();
-        if (member.getDisciplines() != null && member.getDisciplines().size() >= 1) {
+        var disciplines = new ArrayList<Discipline>() {{
             // add the required disciplines to the list
             for (Long disciplineId : member.getDisciplines()) {
-                disciplines.add(this.disciplineRepository.findById(disciplineId)
+                add(disciplineRepository.findById(disciplineId)
                         .orElseThrow(() -> new DisciplineNotFoundException(disciplineId)));
             }
-        }
+        }};
 
         // apply member and disciplines
         existingMember.getDisciplines().forEach(existing -> existing.getMembers().remove(finalMember));
         existingMember.setDisciplines(disciplines);
-        for (Discipline discipline : disciplines) {
+        for (var discipline : disciplines) {
             discipline.getMembers().add(existingMember);
         }
 
         // setup events
-        List<Event> events = new ArrayList<>();
-        if (member.getEvents() != null && member.getEvents().size() >= 1) {
+        var events = new ArrayList<Event>() {{
             // add the required events to the list
             for (Long eventId : member.getEvents()) {
-                events.add(this.eventRepository.findById(eventId)
+                add(eventRepository.findById(eventId)
                         .orElseThrow(() -> new EventNotFoundException(eventId)));
             }
-        }
+        }};
 
         // apply member and events
         existingMember.getEvents().forEach(existing -> existing.getMembers().remove(finalMember));
         existingMember.setEvents(events);
-        for (Event event : events) {
+        for (var event : events) {
             event.getMembers().add(existingMember);
         }
 
         // setup seminars
-        List<Seminar> seminars = new ArrayList<>() {{
-            for (Long seminarId : member.getSeminars()) {
+        var seminars = new ArrayList<Seminar>() {{
+            for (var seminarId : member.getSeminars()) {
                 add(seminarRepository.findById(seminarId).orElseThrow(() -> new SeminarNotFoundException(seminarId)));
             }
         }};
@@ -171,7 +194,7 @@ public class MemberController {
         // apply member and seminars
         existingMember.getSeminars().forEach(existing -> existing.getMembers().remove(finalMember));
         existingMember.setSeminars(seminars);
-        for (Seminar seminar : seminars) {
+        for (var seminar : seminars) {
             seminar.getMembers().add(existingMember);
         }
 
@@ -194,51 +217,88 @@ public class MemberController {
         existingMember.setAccountHolder(member.getAccountHolder());
         existingMember.setNotes(member.getNotes());
 
+        // update the member in the database
         existingMember = this.memberRepository.save(existingMember);
 
+        var uri = URI.create(ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
+
         // return the updated member
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentRequest().toUriString());
         return ResponseEntity.created(uri).body(existingMember);
     }
 
+    /**
+     * Removes the member with the given id from the database.
+     *
+     * @param id the unique identifier of the member
+     * @return a HTTP 204 NO CONTENT if the member was removed successfully
+     * @throws MemberNotFoundException thrown, if no member with the given id exists
+     */
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) throws MemberNotFoundException {
-        Member member = this.memberRepository.findById(id).orElseThrow(() -> new MemberNotFoundException(id));
+        var member = this.memberRepository.findById(id).orElseThrow(() -> new MemberNotFoundException(id));
 
         // remove events
-        for (Event event : member.getEvents()) {
+        for (var event : member.getEvents()) {
             event.getMembers().remove(member);
         }
         member.getEvents().clear();
 
         // remove disciplines
-        for (Discipline discipline : member.getDisciplines()) {
+        for (var discipline : member.getDisciplines()) {
             discipline.getMembers().remove(member);
         }
         member.getDisciplines().clear();
 
         // remove seminars
-        for (Seminar seminar : member.getSeminars()) {
+        for (var seminar : member.getSeminars()) {
             seminar.getMembers().remove(member);
         }
         member.getSeminars().clear();
 
+        // remove the graduation member links
+        for (var graduationMember : member.getGraduations()) {
+            graduationMember.getExam().getGraduationMembers().remove(graduationMember);
+            graduationMember.getGraduation().getGraduationMembers().remove(graduationMember);
+
+            // delete the link in the database
+            graduationMemberRepository.delete(graduationMember);
+        }
+        member.getGraduations().clear();
+
         // remove contribution class
-        member.getContributionClass().getMembers().remove(member);
+        member.getContributionClass().
+                getMembers().
+                remove(member);
         member.setContributionClass(null);
 
         member = this.memberRepository.save(member);
         this.memberRepository.delete(member);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().
+
+                build();
+
     }
 
+    /**
+     * Returns the member with the given id.
+     *
+     * @param id the unique identifier of the member
+     * @return a HTTP 200 OK and the member with the given id
+     * @throws MemberNotFoundException thrown, if no member with the given id exists
+     */
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Member> findById(@PathVariable Long id) throws MemberNotFoundException {
+    public ResponseEntity<Member> show(@PathVariable Long id) throws MemberNotFoundException {
         Member member = this.memberRepository.findById(id).orElseThrow(() -> new MemberNotFoundException(id));
         return ResponseEntity.ok(member);
     }
 
+    /**
+     * Returns a list of all members which matches the given forename and surname string.
+     *
+     * @param name a concat of the forename and surname
+     * @return a HTTP 200 OK and a list of all members matching the given name
+     */
     @GetMapping(value = "/byName/{name}")
     public ResponseEntity<Collection<Member>> findMembersByName(@PathVariable String name) {
         return ResponseEntity.ok(this.memberRepository.findByFullname(name));

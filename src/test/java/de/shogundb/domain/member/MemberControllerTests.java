@@ -10,6 +10,13 @@ import de.shogundb.domain.discipline.DisciplineRepository;
 import de.shogundb.domain.event.Event;
 import de.shogundb.domain.event.EventNotFoundException;
 import de.shogundb.domain.event.EventRepository;
+import de.shogundb.domain.exam.Exam;
+import de.shogundb.domain.exam.ExamRepository;
+import de.shogundb.domain.graduation.GraduationMember;
+import de.shogundb.domain.graduation.GraduationMemberRepository;
+import de.shogundb.domain.graduation.GraduationRepository;
+import de.shogundb.domain.person.Person;
+import de.shogundb.domain.person.PersonRepository;
 import de.shogundb.domain.seminar.Seminar;
 import de.shogundb.domain.seminar.SeminarNotFoundException;
 import de.shogundb.domain.seminar.SeminarRepository;
@@ -46,8 +53,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class MemberControllerTests {
 
-    @Autowired
-    private MemberRepository memberRepository;
 
     @Autowired
     private ContributionClassRepository contributionClassRepository;
@@ -59,7 +64,23 @@ public class MemberControllerTests {
     private EventRepository eventRepository;
 
     @Autowired
+    private ExamRepository examRepository;
+
+    @Autowired
+    private GraduationMemberRepository graduationMemberRepository;
+
+    @Autowired
+    private GraduationRepository graduationRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private PersonRepository personRepository;
+
+    @Autowired
     private SeminarRepository seminarRepository;
+
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -372,24 +393,52 @@ public class MemberControllerTests {
 
     @Test
     public void member_can_be_deleted() throws Exception {
-        Member member = memberRepository.save(createTestMember(contributionClassRepository));
+        // create member
+        var member = memberRepository.save(createTestMember(contributionClassRepository));
 
-        ContributionClass contributionClass = contributionClassRepository.save(ContributionClass.builder()
+        // create contribution class
+        var contributionClass = contributionClassRepository.save(ContributionClass.builder()
                 .name("Test Contribution Class")
                 .baseContribution(10.0)
                 .additionalContribution(5.0)
                 .build());
 
-        Discipline discipline = disciplineRepository.save(Discipline.builder()
+        // create discipline
+        var discipline = disciplineRepository.save(Discipline.builder()
                 .name("Test Discipline")
                 .build());
 
-        Event event = eventRepository.save(Event.builder()
+        // create a graduation
+        var graduation = graduationRepository.save(TestHelper.createTestGraduation());
+
+        // create an exam and persons
+        var exam = examRepository.save(Exam.builder().date(LocalDate.parse("2018-01-02")).build());
+        var examiner1 = personRepository.save(Person.builder().name("Test Examiner 1").build());
+        var examiner2 = personRepository.save(Person.builder().name("Test Examiner 2").build());
+
+        exam.getExaminers().add(examiner1);
+        exam.getExaminers().add(examiner2);
+        examiner1.getExams().add(exam);
+        examiner2.getExams().add(exam);
+
+        // create a graduation member link
+        var graduationMember = GraduationMember.builder()
+                .exam(exam)
+                .graduation(graduation)
+                .member(member)
+                .build();
+        exam.getGraduationMembers().add(graduationMember);
+        graduation.getGraduationMembers().add(graduationMember);
+        member.getGraduations().add(graduationMember);
+
+        graduationMember = graduationMemberRepository.save(graduationMember);
+
+        var event = eventRepository.save(Event.builder()
                 .name("Test Event")
                 .date(LocalDate.parse("2018-01-02"))
                 .build());
 
-        Seminar seminar = seminarRepository.save(createTestSeminar());
+        var seminar = seminarRepository.save(createTestSeminar());
 
         member.setContributionClass(contributionClass);
         member.getDisciplines().add(discipline);
@@ -434,6 +483,9 @@ public class MemberControllerTests {
         eventRepository.findAll().forEach(existing -> assertEquals(0, existing.getMembers().size()));
         contributionClassRepository.findAll().forEach(existing ->
                 assertEquals(0, existing.getMembers().size()));
+
+        // check if the graduation member link was removed
+        assertFalse(graduationMemberRepository.existsById(graduationMember.getId()));
 
         // test with not existing member
         mockMvc.perform(delete("/member/0"))

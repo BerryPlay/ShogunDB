@@ -78,6 +78,7 @@ class MemberUpdateDTO {
     private Boolean isPassive;
 
     @ManyToOne
+    @NotNull
     private Long contributionClass;
 
     @NotNull

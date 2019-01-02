@@ -75,6 +75,7 @@ class MemberRegisterDTO {
     private Boolean isPassive;
 
     @ManyToOne
+    @NotNull
     private Long contributionClass;
 
     @NotNull
@@ -82,5 +83,6 @@ class MemberRegisterDTO {
     private String accountHolder;
 
     @Builder.Default
+    @NotNull
     private List<Long> disciplines = new ArrayList<>();
 }

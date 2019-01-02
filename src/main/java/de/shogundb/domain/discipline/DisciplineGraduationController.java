@@ -46,7 +46,7 @@ public class DisciplineGraduationController {
     }
 
     /**
-     * Adds a new  graduation to the database for the discipline with the given id and links all given members, persons
+     * Adds a new graduation to the database for the discipline with the given id and links all given members, persons
      * and graduations to it.
      *
      * @param graduation   the graduation to store
