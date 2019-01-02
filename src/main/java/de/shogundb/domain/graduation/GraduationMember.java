@@ -1,8 +1,8 @@
 package de.shogundb.domain.graduation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.shogundb.domain.member.Member;
 import de.shogundb.domain.exam.Exam;
+import de.shogundb.domain.member.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -59,4 +59,22 @@ public class GraduationMember {
             CascadeType.REFRESH})
     @JsonIgnore
     private Exam exam;
+
+    /**
+     * Helper method removes a graduation member link.
+     *
+     * @param graduationMember           the graduation member link to unlink
+     * @param graduationMemberRepository the jpa repository object to handle the database access
+     */
+    public static void removeGraduationMember(
+            GraduationMember graduationMember,
+            GraduationMemberRepository graduationMemberRepository) {
+        // unlink all
+        graduationMember.getExam().getGraduationMembers().remove(graduationMember);
+        graduationMember.getGraduation().getGraduationMembers().remove(graduationMember);
+        graduationMember.getMember().getGraduations().remove(graduationMember);
+
+        // delete the link in the database
+        graduationMemberRepository.delete(graduationMember);
+    }
 }

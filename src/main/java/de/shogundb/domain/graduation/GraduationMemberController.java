@@ -11,6 +11,8 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 import java.net.URI;
 
+import static de.shogundb.domain.graduation.GraduationMember.removeGraduationMember;
+
 @RestController
 @RequestMapping("/graduationMember")
 public class GraduationMemberController {
@@ -98,13 +100,7 @@ public class GraduationMemberController {
         var graduationMember = graduationMemberRepository.findById(id)
                 .orElseThrow(() -> new GraduationMemberNotFoundException(id));
 
-        // unlink all
-        graduationMember.getExam().getGraduationMembers().remove(graduationMember);
-        graduationMember.getGraduation().getGraduationMembers().remove(graduationMember);
-        graduationMember.getMember().getGraduations().remove(graduationMember);
-
-        // delete the link in the database
-        graduationMemberRepository.delete(graduationMember);
+        removeGraduationMember(graduationMember, graduationMemberRepository);
 
         return ResponseEntity.noContent().build();
     }
