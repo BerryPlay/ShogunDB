@@ -108,4 +108,18 @@ public class GraduationMemberController {
 
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * Shows the graduation member link with the given id.
+     *
+     * @param id the unique identifier of the graduation member link
+     * @return a HTTP 200 OK and the graduation member link, if it exists in the database
+     * @throws GraduationNotFoundException thrown, if the graduation member link with the given id does not exists in
+     *                                     the database
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<GraduationMember> show(@PathVariable Long id) throws GraduationNotFoundException {
+        return ResponseEntity.ok(graduationMemberRepository.findById(id)
+                .orElseThrow(() -> new GraduationNotFoundException(id)));
+    }
 }
