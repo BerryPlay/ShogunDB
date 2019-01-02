@@ -1,7 +1,16 @@
 package de.shogundb.domain.discipline;
 
+import de.shogundb.TestHelper;
+import de.shogundb.domain.contributionClass.ContributionClassRepository;
+import de.shogundb.domain.exam.Exam;
+import de.shogundb.domain.exam.ExamRepository;
 import de.shogundb.domain.graduation.Graduation;
+import de.shogundb.domain.graduation.GraduationMember;
+import de.shogundb.domain.graduation.GraduationMemberRepository;
 import de.shogundb.domain.graduation.GraduationRepository;
+import de.shogundb.domain.member.MemberRepository;
+import de.shogundb.domain.person.Person;
+import de.shogundb.domain.person.PersonRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +25,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static de.shogundb.TestHelper.toJson;
@@ -23,6 +33,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,10 +46,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DisciplineGraduationControllerTests {
 
     @Autowired
+    private ContributionClassRepository contributionClassRepository;
+
+    @Autowired
     private DisciplineRepository disciplineRepository;
 
     @Autowired
+    private GraduationMemberRepository graduationMemberRepository;
+
+    @Autowired
     private GraduationRepository graduationRepository;
+
+    @Autowired
+    private ExamRepository examRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private PersonRepository personRepository;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -132,48 +158,62 @@ public class DisciplineGraduationControllerTests {
 
     @Test
     public void graduation_can_be_removed_from_discipline() throws Exception {
+        // create test member
+        var member = memberRepository.save(TestHelper.createTestMember(contributionClassRepository));
+
         Discipline discipline = disciplineRepository.save(Discipline.builder()
                 .name("Test Discipline")
                 .build());
 
-        Graduation graduation1 = graduationRepository.save(Graduation.builder()
+        Graduation graduation = Graduation.builder()
                 .name("First Test Graduation")
                 .color("Blue")
                 .examConditions("Test Exam Conditions")
                 .highlightConditions("Test Highlight Conditions")
-                .build());
+                .discipline(discipline)
+                .build();
 
-        Graduation graduation2 = graduationRepository.save(Graduation.builder()
-                .name("Another Test Graduation")
-                .color("Black")
-                .examConditions("Another Test Exam Conditions")
-                .highlightConditions("Another Test Highlight Conditions")
-                .build());
+        discipline.getGraduations().add(graduation);
 
-        discipline.getGraduations().add(graduation1);
-        discipline.getGraduations().add(graduation2);
+        graduation = graduationRepository.save(graduation);
 
-        graduation1.setDiscipline(discipline);
-        graduation2.setDiscipline(discipline);
+        // create an exam and persons
+        Exam exam = examRepository.save(Exam.builder().date(LocalDate.parse("2018-01-02")).build());
+        Person examiner1 = personRepository.save(Person.builder().name("Test Examiner 1").build());
+        Person examiner2 = personRepository.save(Person.builder().name("Test Examiner 2").build());
 
-        discipline = disciplineRepository.save(discipline);
+        exam.getExaminers().add(examiner1);
+        exam.getExaminers().add(examiner2);
+        examiner1.getExams().add(exam);
+        examiner2.getExams().add(exam);
 
-        mockMvc.perform(delete("/discipline/graduation/" + graduation1.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value(hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value(notNullValue()))
-                .andExpect(jsonPath("$[0].name").value(is(graduation2.getName())))
-                .andExpect(jsonPath("$[0].color").value(is(graduation2.getColor())))
-                .andExpect(jsonPath("$[0].examConditions").value(is(graduation2.getExamConditions())))
-                .andExpect(jsonPath("$[0].highlightConditions").value(is(graduation2.getHighlightConditions())));
+        // create a graduation member connection
+        GraduationMember graduationMember = GraduationMember.builder()
+                .exam(exam)
+                .graduation(graduation)
+                .member(member)
+                .build();
+        exam.getGraduationMembers().add(graduationMember);
+        graduation.getGraduationMembers().add(graduationMember);
+        member.getGraduations().add(graduationMember);
 
-        List<Graduation> graduations = disciplineRepository.findById(discipline.getId()).map(Discipline::getGraduations)
-                .orElseThrow(DisciplineNotFoundException::new);
+        graduationMember = graduationMemberRepository.save(graduationMember);
 
-        assertEquals(graduations.size(), 1);
-        assertEquals(graduations.get(0).getName(), graduation2.getName());
-        assertEquals(graduations.get(0).getColor(), graduation2.getColor());
-        assertEquals(graduations.get(0).getExamConditions(), graduation2.getExamConditions());
-        assertEquals(graduations.get(0).getHighlightConditions(), graduation2.getHighlightConditions());
+        mockMvc.perform(delete("/discipline/graduation/" + graduation.getId()))
+                .andExpect(status().isNoContent());
+
+        // update the entities
+        var updatedMember = memberRepository.findById(member.getId()).orElseThrow();
+        var updatedExam = examRepository.findById(exam.getId()).orElseThrow();
+
+        // check if the graduation was removed successfully
+        assertFalse(graduationRepository.existsById(graduation.getId()));
+
+        // check if the graduation member link was removed successfully
+        assertFalse(graduationMemberRepository.existsById(graduationMember.getId()));
+
+        // check if the links are removed from the other entities
+        assertEquals(0, updatedMember.getGraduations().size());
+        assertEquals(0, updatedExam.getGraduationMembers().size());
     }
 }
