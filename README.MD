@@ -1,8 +1,21 @@
 # ShugunDB Backend
 
-The REST(full), java spring boot based, backend server of the shogundb project.
+This the the official ShogunDB Project. 
+
+## Backend
+
+The backend is a Spring Boot REST Server which handles all database operations. All endpoints are documented in the 
+![Project-Wiki](https://github.com/BerryPlay/ShogunDB/wiki).
+
+## Frontend
+
+The frontend is a standalone Vue.js application which communicates over HTTP requests with the backend.
 
 ## Installation
+
+### With maven
+
+To build the application just execute `./mvnw install`. This will build the frontend, merge it into the public folder of the backend and finally build the backend. The `.jar` archive will be placed under `backend/target/backend-X.X.X-SNAPSHOT.jar` and can be executed with `java -jar backend/target/backend-X.X.X-SNAPSHOT.jar`.
 
 ### With Docker
 
