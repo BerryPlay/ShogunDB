@@ -122,6 +122,7 @@
                                         <include>css/</include>
                                         <include>img/</include>
                                         <include>js/</include>
+                                        <include>fonts/</include>
                                         <include>index.html</include>
                                     </includes>
                                 </resource>

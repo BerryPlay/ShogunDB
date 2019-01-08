@@ -43,6 +43,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/css/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/js/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/img/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/fonts/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/favicon.ico").permitAll()
 
                 // permit the authentication routes
                 .antMatchers(HttpMethod.POST, "/token").permitAll()
