@@ -71,6 +71,16 @@
                             v-model="input.value"
                   ></v-select>
                 </div>
+
+                <!-- text input -->
+                <v-text-field :counter="input.counter"
+                              :hint="input.hint"
+                              :label="input.label"
+                              :rules="input.rules"
+                              v-if="input.type === 'number'"
+                              type="number"
+                              v-model="input.value"
+                ></v-text-field>
               </div>
             </v-flex>
           </v-layout>
@@ -110,7 +120,8 @@
                   hint: '*required',
                   rules: [
                     v => !!v || 'Forename is required',
-                    v => (v && v.length <= 200) || 'Forename must have less than 200 character',
+                    v => (v.length >= 1 && v.length <= 200)
+                      || 'Forename must have less than 200 character',
                   ],
                 },
                 surname: {
@@ -121,7 +132,8 @@
                   hint: '*required',
                   rules: [
                     v => !!v || 'Surname is required',
-                    v => (v && v.length < 200) || 'Surname must have less than 200 character',
+                    v => (v.length >= 1 && v.length < 200)
+                      || 'Surname must have less than 200 character',
                   ],
                 },
                 gender: {
@@ -147,13 +159,106 @@
                   hint: '*required',
                   rules: [
                     v => !!v || 'Date of birth is required',
-                    v => (v.substring(2, 3) === '.' && v.substring(5, 6) === '.') || 'Incorrect date format',
+                    v => (v.substring(2, 3) === '.' && v.substring(5, 6) === '.')
+                      || 'Incorrect date format',
                   ],
                 },
               },
             },
+            contactInformation: {
+              title: 'Contact',
+              inputs: {
+                street: {
+                  label: 'Street',
+                  type: 'text',
+                  value: '',
+                  counter: 200,
+                  hint: '*required',
+                  rules: [
+                    v => !!v || 'Street is required',
+                    v => (v.length >= 1 && v.length <= 200)
+                      || 'Street must have less than 200 character',
+                  ],
+                },
+                postcode: {
+                  label: 'Postcode',
+                  type: 'number',
+                  value: '',
+                  hint: '*required',
+                  rules: [
+                    v => !!v || 'Postcode is required',
+                    v => (v.length >= 3 && v.length <= 8)
+                      || 'Postcode must have between 3 and 8 digits',
+                  ],
+                },
+                city: {
+                  label: 'City',
+                  type: 'text',
+                  value: '',
+                  counter: 200,
+                  hint: '*required',
+                  rules: [
+                    v => !!v || 'City is required',
+                    v => (v.length >= 1 && v.length <= 200)
+                      || 'City must have less than 200 character',
+                  ],
+                },
+                phoneNumber: {
+                  label: 'Phone number',
+                  type: 'text',
+                  value: '',
+                  counter: 200,
+                  hint: '*required',
+                  rules: [
+                    v => !!v || ' is required',
+                    v => (v.length >= 4 && v.length <= 200) || 'Phone number must have between 3 ' +
+                      'and 8 digits',
+                  ],
+                },
+                mobileNumber: {
+                  label: 'Mobile number',
+                  type: 'text',
+                  value: '',
+                  counter: 200,
+                  rules: [
+                    v => (v.length === 0 || (v.length >= 4 && v.length <= 200))
+                      || 'Mobile number must have between 3 and 8 digits',
+                  ],
+                },
+                email: {
+                  label: 'E-Mail address',
+                  type: 'text',
+                  value: '',
+                  counter: 200,
+                  hint: '*required',
+                  rules: [
+                    v => !!v || 'E-Mail address is required',
+                    v => (v.length >= 4 && v.length <= 200) || 'E-Mail address must have between ' +
+                      '3 and 8 digits',
+                    v => this.emailRegEx.test(v) || 'Must be a valid e-mail address',
+                  ],
+                },
+              }
+            },
+            membershipInformation: {
+              title: 'Membership',
+              inputs: {
+                enteredDate: {
+                  label: 'Entered date',
+                  type: 'date',
+                  value: '',
+                  hint: '*required',
+                  rules: [
+                    v => !!v || 'Entered date is required',
+                    v => (v.substring(2, 3) === '.' && v.substring(5, 6) === '.')
+                      || 'Incorrect date format',
+                  ],
+                },
+              },
+            }
           },
         },
+        emailRegEx: /^[A-Za-z0-9_.]+@[A-Za-z0-9_.]+\.[A-Za-z0-9_.]+$/,
       };
     },
     methods: {
@@ -162,7 +267,7 @@
        */
       submit() {
         if (this.$refs.form.validate()) {
-          alert('everything is ok');
+          alert(JSON.stringify(this.member));
         }
       },
       /**
@@ -188,8 +293,25 @@
        */
       member() {
         const generalInformation = this.form.cards.generalInformation.inputs;
+        const contactInformation = this.form.cards.contactInformation.inputs;
+        const membershipInformation = this.form.cards.membershipInformation.inputs;
         return {
-          forename: generalInformation.forename,
+          // general
+          forename: generalInformation.forename.value,
+          surname: generalInformation.surname.value,
+          gender: generalInformation.gender.value,
+          dateOfBirth: generalInformation.dateOfBirth.value,
+
+          // contact
+          street: contactInformation.street.value,
+          postcode: contactInformation.postcode.value,
+          city: contactInformation.city.value,
+          phoneNumber: contactInformation.phoneNumber.value,
+          mobileNumber: contactInformation.mobileNumber.value,
+          email: contactInformation.email.value,
+
+          // membershipInformation
+          enteredDate: membershipInformation.enteredDate.value,
         };
       },
     },
