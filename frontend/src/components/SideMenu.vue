@@ -129,6 +129,33 @@
               },
             ],
           },
+          {
+            name: 'Discipline',
+            icon: 'rowing',
+            items: [
+              {
+                label: 'Add new',
+                icon: 'add',
+                route: {name: 'addDiscipline'},
+              },
+            ],
+          },
+          {
+            name: 'Contribution class',
+            icon: 'library_books',
+            items: [
+              {
+                label: 'Add new',
+                icon: 'library_add',
+                route: {name: 'addContributionClass'},
+              },
+              {
+                label: 'Show all',
+                icon: 'view_list',
+                route: {name: 'indexContributionClass'},
+              },
+            ],
+          },
         ],
       };
     },

@@ -27,21 +27,37 @@ export default new Router({
         noAuth: true,
       },
     },
+    // contribution class routes
+    {
+      path: '/contributionClass/add',
+      name: 'addContributionClass',
+      component: () => import('./views/contributionClass/AddContributionClass.vue'),
+    },
+    {
+      path: '/contributionClass/index',
+      name: 'indexContributionClass',
+      component: () => import('./views/contributionClass/IndexContributionClass.vue'),
+    },
+    {
+      path: '/contributionClass/show/:id',
+      name: 'showContributionClass',
+      component: () => import('./views/contributionClass/ShowContributionClass.vue'),
+    },
+    // discipline routes
+    {
+      path: '/discipline/add',
+      name: 'addDiscipline',
+      component: () => import('./views/discipline/AddDiscipline.vue'),
+    },
     {
       path: '/member/add',
       name: 'addMember',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/member/AddMember.vue'),
+      component: () => import('./views/member/AddMember.vue'),
     },
     {
       path: '/member/search',
       name: 'searchMember',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
+      component: () => import('./views/About.vue'),
     },
   ],
 });

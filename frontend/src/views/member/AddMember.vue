@@ -28,6 +28,7 @@
                               :rules="input.rules"
                               v-if="input.type === 'text'"
                               v-model="input.value"
+                              :color="color"
                 ></v-text-field>
 
                 <!-- date input -->
@@ -41,6 +42,7 @@
                     min-width="290px"
                     offset-y
                     transition="scale-transition"
+                    :color="color"
                   >
                     <v-text-field :counter="input.counter"
                                   :hint="input.hint"
@@ -50,12 +52,14 @@
                                   prepend-icon="event"
                                   readonly
                                   slot="activator"
+                                  :color="color"
                     ></v-text-field>
                     <v-date-picker :max="input.maxDate"
                                    locale="de-DE"
                                    no-title
                                    scrollable
                                    v-model="input.value"
+                                   :color="color"
                     >
                     </v-date-picker>
                   </v-menu>
@@ -68,11 +72,13 @@
                             :items="input.items"
                             :label="input.label"
                             :rules="input.rules"
+                            :multiple="input.multi"
                             v-model="input.value"
+                            :color="color"
                   ></v-select>
                 </div>
 
-                <!-- text input -->
+                <!-- number input -->
                 <v-text-field :counter="input.counter"
                               :hint="input.hint"
                               :label="input.label"
@@ -80,20 +86,26 @@
                               v-if="input.type === 'number'"
                               type="number"
                               v-model="input.value"
+                              :color="color"
                 ></v-text-field>
+
+                <v-checkbox :label="input.label"
+                            v-model="input.value"
+                            v-if="input.type === 'checkbox'"
+                            :color="color"
+                ></v-checkbox>
               </div>
             </v-flex>
           </v-layout>
         </v-card-text>
       </v-card>
-      <v-btn
-        @click="submit"
-        bottom
-        color="pink"
-        dark
-        fab
-        fixed
-        right
+      <v-btn @click="submit"
+             bottom
+             :color="color"
+             dark
+             fab
+             fixed
+             right
       >
         <v-icon>save</v-icon>
       </v-btn>
@@ -141,9 +153,14 @@
                   type: 'select',
                   value: '',
                   items: [
-                    'male',
-                    'female',
-                    'diverse',
+                    {
+                      value:'MALE',
+                      text: 'male',
+                    },
+                    {
+                      value:'FEMALE',
+                      text: 'female',
+                    },
                   ],
                   rules: [
                     v => !!v || 'Gender is required',
@@ -254,12 +271,89 @@
                       || 'Incorrect date format',
                   ],
                 },
+                hasBudoPass: {
+                  label: 'Budo pass',
+                  type: 'checkbox',
+                  value: '',
+                },
+                budoPassDate: {
+                  label: 'Budo pass date',
+                  type: 'date',
+                  value: '',
+                  hint: '*required',
+                  rules: [
+                    v => (v.substring(2, 3) === '.' && v.substring(5, 6) === '.')
+                      || 'Incorrect date format',
+                  ],
+                },
               },
-            }
+            },
+            moreInformation: {
+              title: 'More',
+              inputs: {
+                disciplines: {
+                  label: 'Disciplines',
+                  type: 'select',
+                  multi: true,
+                  value: '',
+                  items: [],
+                  rules: [
+                    v => !!v || 'Contribution class is required',
+                  ],
+                },
+                contributionClass: {
+                  label: 'Contribution class',
+                  type: 'select',
+                  value: '',
+                  items: [],
+                  rules: [
+                    v => !!v || 'Contribution class is required',
+                  ],
+                },
+                accountHolder: {
+                  label: 'Account holder',
+                  type: 'text',
+                  value: '',
+                  counter: 200,
+                  hint: '*required',
+                  rules: [
+                    v => !!v || 'Account holder is required',
+                    v => (v.length >= 1 && v.length < 200)
+                      || 'Account holder must have less than 200 character',
+                  ],
+                },
+              },
+            },
           },
         },
         emailRegEx: /^[A-Za-z0-9_.]+@[A-Za-z0-9_.]+\.[A-Za-z0-9_.]+$/,
+        color: 'pink',
       };
+    },
+    created() {
+      // fetch the contribution classes
+      this.$axios.get('/contributionClass')
+        .then((response) => {
+          response.data.forEach((contributionClass) => {
+            this.form.cards.moreInformation.inputs.contributionClass.items.push({
+              text: contributionClass.name,
+              value: contributionClass.id
+            });
+          });
+        })
+        .catch(() => alert('something went wrong!'));
+
+      // fetch the disciplines
+      this.$axios.get('/discipline')
+        .then((response) => {
+          response.data.forEach((discipline) => {
+            this.form.cards.moreInformation.inputs.disciplines.items.push({
+              text: discipline.name,
+              value: discipline.id
+            });
+          });
+        })
+        .catch(() => alert('something went wrong!'));
     },
     methods: {
       /**
@@ -267,7 +361,16 @@
        */
       submit() {
         if (this.$refs.form.validate()) {
-          alert(JSON.stringify(this.member));
+          this.$axios.post('/member', this.member)
+            .then((response) => {
+              alert('success');
+            })
+            .catch(() => {
+              alert('failed');
+            })
+            .finally(() => {
+              this.loading = false;
+            });
         }
       },
       /**
@@ -295,6 +398,7 @@
         const generalInformation = this.form.cards.generalInformation.inputs;
         const contactInformation = this.form.cards.contactInformation.inputs;
         const membershipInformation = this.form.cards.membershipInformation.inputs;
+        const moreInformation = this.form.cards.moreInformation.inputs;
         return {
           // general
           forename: generalInformation.forename.value,
@@ -312,6 +416,17 @@
 
           // membershipInformation
           enteredDate: membershipInformation.enteredDate.value,
+          hasBudoPass: membershipInformation.hasBudoPass.value,
+          budoPassDate: membershipInformation.budoPassDate.value,
+
+          // moreInformation
+          disciplines: moreInformation.disciplines.value,
+          contributionClass: moreInformation.contributionClass.value,
+          accountHolder: moreInformation.accountHolder.value,
+
+          // other data
+          hasLeft: false,
+          isPassive: false,
         };
       },
     },
