@@ -24,9 +24,9 @@
 </template>
 
 <script>
-  export default {
-    name: 'ApplicationFooter',
-  };
+export default {
+  name: 'ApplicationFooter',
+};
 </script>
 
 <style scoped>

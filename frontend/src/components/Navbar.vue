@@ -15,15 +15,15 @@
 </template>
 
 <script>
-  export default {
-    name: 'Navbar',
-    props: {
-      clipped: Boolean,
-      drawer: Boolean,
-      title: String,
-      subtitle: String,
-    },
-  };
+export default {
+  name: 'Navbar',
+  props: {
+    clipped: Boolean,
+    drawer: Boolean,
+    title: String,
+    subtitle: String,
+  },
+};
 </script>
 
 <style scoped>

@@ -85,98 +85,104 @@
 </template>
 
 <script>
-  export default {
-    name: "AddContributionClass",
-    data() {
-      return {
-        form: {
-          valid: true,
-          cards: {
-            generalInformation: {
-              title: 'General information',
-              inputs: {
-                name: {
-                  label: 'Name',
-                  type: 'text',
-                  value: '',
-                  counter: 200,
-                  hint: '*required',
-                  rules: [
-                    v => !!v || 'Forename is required',
-                    v => (v.length >= 1 && v.length <= 200)
-                      || 'Name must have less than 200 character',
-                  ],
-                },
+export default {
+  name: 'AddContributionClass',
+  data() {
+    return {
+      form: {
+        valid: true,
+        cards: {
+          generalInformation: {
+            title: 'General information',
+            inputs: {
+              name: {
+                label: 'Name',
+                type: 'text',
+                value: '',
+                counter: 200,
+                hint: '*required',
+                rules: [
+                  v => !!v || 'Forename is required',
+                  v => (v.length >= 1 && v.length <= 200)
+                    || 'Name must have less than 200 character',
+                ],
               },
             },
-            contributionInformation: {
-              title: 'Contribution',
-              inputs: {
-                baseContribution: {
-                  label: 'Base contribution',
-                  type: 'text',
-                  value: '',
-                  hint: '*required',
-                  prependIcon: 'euro_symbol',
-                  rules: [
-                    v => !!v || 'Base contribution is required',
-                    v => this.numberPattern.test(v) || 'Invalid format! Must be X.XX',
-                  ],
-                },
-                additionalContribution: {
-                  label: 'Additional contribution',
-                  type: 'text',
-                  value: '',
-                  hint: '*required',
-                  prependIcon: 'euro_symbol',
-                  rules: [
-                    v => !!v || 'Additional contribution is required',
-                    v => this.numberPattern.test(v) || 'Invalid format! Must be X.XX',
-                  ],
-                },
+          },
+          contributionInformation: {
+            title: 'Contribution',
+            inputs: {
+              baseContribution: {
+                label: 'Base contribution',
+                type: 'text',
+                value: '',
+                hint: '*required',
+                prependIcon: 'euro_symbol',
+                rules: [
+                  v => !!v || 'Base contribution is required',
+                  v => this.numberPattern.test(v) || 'Invalid format! Must be X.XX',
+                ],
+              },
+              additionalContribution: {
+                label: 'Additional contribution',
+                type: 'text',
+                value: '',
+                hint: '*required',
+                prependIcon: 'euro_symbol',
+                rules: [
+                  v => !!v || 'Additional contribution is required',
+                  v => this.numberPattern.test(v) || 'Invalid format! Must be X.XX',
+                ],
               },
             },
           },
         },
-        numberPattern: /^[0-9]+\.[0-9][0-9]$/,
-        color: 'green',
+      },
+      numberPattern: /^[0-9]+\.[0-9][0-9]$/,
+      color: 'green',
+    };
+  },
+  methods: {
+    /**
+     * Validates all inputs and submits the form
+     */
+    submit() {
+      if (this.$refs.form.validate()) {
+        this.$axios.post('/contributionClass', this.contributionClass)
+          .then((response) => {
+            this.$emit('message', 'Contribution class was added successfully.', 'success');
+            this.$router.push({
+              name: 'showContributionClass',
+              params: {
+                id: response.data.id,
+              },
+            });
+          })
+          .catch(() => {
+            this.$emit('message', 'Something went wrong.', 'error');
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      }
+    },
+  },
+  computed: {
+    /**
+     * A computed object, which holds all entered information from the form.
+     */
+    contributionClass() {
+      const generalInformation = this.form.cards.generalInformation.inputs;
+      const contributionInformation = this.form.cards.contributionInformation.inputs;
+      return {
+        // general
+        name: generalInformation.name.value,
+        baseContribution: contributionInformation.baseContribution.value,
+        additionalContribution: contributionInformation.additionalContribution.value,
       };
     },
-    methods: {
-      /**
-       * Validates all inputs and submits the form
-       */
-      submit() {
-        if (this.$refs.form.validate()) {
-          this.$axios.post('/contributionClass', this.contributionClass)
-            .then((response) => {
-              this.$router.push({name: 'showContributionClass', params: {id: response.data.id}})
-            })
-            .catch(() => {
-
-            })
-            .finally(() => {
-              this.loading = false;
-            });
-        }
-      },
-    },
-    computed: {
-      /**
-       * A computed object, which holds all entered information from the form.
-       */
-      contributionClass() {
-        const generalInformation = this.form.cards.generalInformation.inputs;
-        const contributionInformation = this.form.cards.contributionInformation.inputs;
-        return {
-          // general
-          name: generalInformation.name.value,
-          baseContribution: contributionInformation.baseContribution.value,
-          additionalContribution: contributionInformation.additionalContribution.value,
-        };
-      },
-    },
-  };
+  },
+};
 </script>
 
 <style scoped>

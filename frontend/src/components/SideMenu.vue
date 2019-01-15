@@ -70,96 +70,112 @@
 </template>
 
 <script>
-  export default {
-    name: 'Menu',
-    props: {
-      clipped: Boolean,
-      drawer: Boolean,
-      showLogout: Boolean,
-    },
-    data() {
-      return {
-        homeRoute: {name: 'dashboard'},
-        groups: [
-          {
-            name: 'Member',
-            icon: 'people',
-            items: [
-              {
-                label: 'Add new',
-                icon: 'person_add',
-                route: {name: 'addMember'},
+export default {
+  name: 'Menu',
+  props: {
+    clipped: Boolean,
+    drawer: Boolean,
+    showLogout: Boolean,
+  },
+  data() {
+    return {
+      homeRoute: {
+        name: 'dashboard',
+      },
+      groups: [
+        {
+          name: 'Member',
+          icon: 'people',
+          items: [
+            {
+              label: 'Add new',
+              icon: 'person_add',
+              route: {
+                name: 'addMember',
               },
-              {
-                label: 'Search',
-                icon: 'search',
-                route: {name: 'searchMember'},
+            },
+            {
+              label: 'Search',
+              icon: 'search',
+              route: {
+                name: 'searchMember',
               },
-            ],
-          },
-          {
-            name: 'Seminars',
-            icon: 'school',
-            items: [
-              {
-                label: 'Add new',
-                icon: 'add',
-                route: {name: 'about'},
+            },
+          ],
+        },
+        {
+          name: 'Seminars',
+          icon: 'school',
+          items: [
+            {
+              label: 'Add new',
+              icon: 'add',
+              route: {
+                name: 'about',
               },
-              {
-                label: 'Search',
-                icon: 'search',
-                route: {name: 'dashboard'},
+            },
+            {
+              label: 'Search',
+              icon: 'search',
+              route: {
+                name: 'dashboard',
               },
-            ],
-          },
-          {
-            name: 'Events',
-            icon: 'event',
-            items: [
-              {
-                label: 'Add new',
-                icon: 'add',
-                route: 'Route',
+            },
+          ],
+        },
+        {
+          name: 'Events',
+          icon: 'event',
+          items: [
+            {
+              label: 'Add new',
+              icon: 'add',
+              route: 'Route',
+            },
+            {
+              label: 'Search',
+              icon: 'search',
+              route: 'Route',
+            },
+          ],
+        },
+        {
+          name: 'Discipline',
+          icon: 'rowing',
+          items: [
+            {
+              label: 'Add new',
+              icon: 'add',
+              route: {
+                name: 'addDiscipline',
               },
-              {
-                label: 'Search',
-                icon: 'search',
-                route: 'Route',
+            },
+          ],
+        },
+        {
+          name: 'Contribution class',
+          icon: 'library_books',
+          items: [
+            {
+              label: 'Add new',
+              icon: 'library_add',
+              route: {
+                name: 'addContributionClass',
               },
-            ],
-          },
-          {
-            name: 'Discipline',
-            icon: 'rowing',
-            items: [
-              {
-                label: 'Add new',
-                icon: 'add',
-                route: {name: 'addDiscipline'},
+            },
+            {
+              label: 'Show all',
+              icon: 'view_list',
+              route: {
+                name: 'indexContributionClass',
               },
-            ],
-          },
-          {
-            name: 'Contribution class',
-            icon: 'library_books',
-            items: [
-              {
-                label: 'Add new',
-                icon: 'library_add',
-                route: {name: 'addContributionClass'},
-              },
-              {
-                label: 'Show all',
-                icon: 'view_list',
-                route: {name: 'indexContributionClass'},
-              },
-            ],
-          },
-        ],
-      };
-    },
-  };
+            },
+          ],
+        },
+      ],
+    };
+  },
+};
 </script>
 
 <style scoped>

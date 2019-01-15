@@ -30,41 +30,41 @@
 </template>
 
 <script>
-  export default {
-    name: "AddDiscipline",
-    data() {
-      return {
-        name: '',
-        rules: [
-          v => !!v || 'Name is required',
-          v => (v.length >= 1 && v.length <= 200)
-            || 'Forename must have less than 200 character',
-        ],
-        color: 'blue',
-      };
-    },
-    methods: {
-      /**
-       * Validates all inputs and submits the form
-       */
-      submit() {
-        if (this.$refs.form.validate()) {
-          this.$axios.post('/discipline', {
-            name: this.name,
+export default {
+  name: 'AddDiscipline',
+  data() {
+    return {
+      name: '',
+      rules: [
+        v => !!v || 'Name is required',
+        v => (v.length >= 1 && v.length <= 200)
+          || 'Forename must have less than 200 character',
+      ],
+      color: 'blue',
+    };
+  },
+  methods: {
+    /**
+     * Validates all inputs and submits the form
+     */
+    submit() {
+      if (this.$refs.form.validate()) {
+        this.$axios.post('/discipline', {
+          name: this.name,
+        })
+          .then(() => {
+            this.$emit('message', 'Discipline was added successfully.', 'success');
           })
-            .then((response) => {
-              alert('success')
-            })
-            .catch(() => {
-
-            })
-            .finally(() => {
-              this.loading = false;
-            });
-        }
-      },
-    }
-  };
+          .catch(() => {
+            this.$emit('message', 'Something went wrong.', 'error');
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      }
+    },
+  },
+};
 </script>
 
 <style scoped>

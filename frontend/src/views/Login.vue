@@ -63,70 +63,70 @@
 </template>
 
 <script>
-  export default {
-    name: 'Login',
-    data() {
-      return {
-        valid: true,
-        showModal: true,
-        loading: false,
-        username: '',
-        usernameRules: [
-          v => !!v || 'Name is required',
-          v => (v && v.length > 3 && v.length < 200)
-            || 'Name can only have more than 3 and less than 200 characters',
-        ],
-        password: '',
-        showPassword: false,
-        passwordRules: [
-          v => !!v || 'Password is required',
-        ],
-        showAuthenticationError: false,
-        errorText: 'Login failed',
-      };
-    },
-    created() {
-      // set the authenticated flag to false
-      localStorage.authenticated = false;
-    },
-    methods: {
-      /**
-       * Validates the form inputs and sends a request with the login credentials to obtain a token.
-       */
-      login() {
-        this.loading = true;
+export default {
+  name: 'Login',
+  data() {
+    return {
+      valid: true,
+      showModal: true,
+      loading: false,
+      username: '',
+      usernameRules: [
+        v => !!v || 'Name is required',
+        v => (v && v.length > 3 && v.length < 200)
+          || 'Name can only have more than 3 and less than 200 characters',
+      ],
+      password: '',
+      showPassword: false,
+      passwordRules: [
+        v => !!v || 'Password is required',
+      ],
+      showAuthenticationError: false,
+      errorText: 'Login failed',
+    };
+  },
+  created() {
+    // set the authenticated flag to false
+    localStorage.authenticated = false;
+  },
+  methods: {
+    /**
+     * Validates the form inputs and sends a request with the login credentials to obtain a token.
+     */
+    login() {
+      this.loading = true;
 
-        if (this.$refs.form.validate()) {
-          this.$axios.post('/token', {
-            username: this.username,
-            password: this.password,
+      if (this.$refs.form.validate()) {
+        this.$axios.post('/token', {
+          username: this.username,
+          password: this.password,
+        })
+          .then((response) => {
+            // store the token to the local storage
+            localStorage.authenticationToken = response.data;
+            localStorage.authenticated = true;
+
+            // apply the token as the default authentication header for axios
+            this.$axios.defaults.headers.common.Authorization = `Bearer ${response.data}`;
+
+            // emit the login event to display the logout button
+            this.$emit('login');
+
+            // exit the login view
+            this.$router.push('/');
           })
-            .then((response) => {
-              // store the token to the local storage
-              localStorage.authenticationToken = response.data;
-              localStorage.authenticated = true;
-
-              // apply the token as the default authentication header for axios
-              this.$axios.defaults.headers.common.Authorization = `Bearer ${response.data}`;
-
-              // emit the login event to display the logout button
-              this.$emit('login');
-
-              // exit the login view
-              this.$router.push('/');
-            })
-            .catch(() => {
-              // opens the error snackbar
-              this.showAuthenticationError = true;
-              localStorage.authenticated = false;
-            })
-            .finally(() => {
-              this.loading = false;
-            });
-        }
-      },
+          .catch(() => {
+            // opens the error snackbar
+            this.showAuthenticationError = true;
+            localStorage.authenticated = false;
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      }
     },
-  };
+  },
+};
 </script>
 
 <style scoped>

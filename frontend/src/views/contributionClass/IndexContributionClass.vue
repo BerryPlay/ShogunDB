@@ -33,24 +33,24 @@
 </template>
 
 <script>
-  export default {
-    name: "IndexContributionClass",
-    data() {
-      return {
-        contributionClasses: [],
-      };
-    },
-    created() {
-      // fetch the contribution classes
-      this.$axios.get('/contributionClass')
-        .then((response) => {
-          response.data.forEach((contributionClass) => {
-            this.contributionClasses.push(contributionClass);
-          });
-        })
-        .catch(() => alert('something went wrong!'));
-    }
-  };
+export default {
+  name: 'IndexContributionClass',
+  data() {
+    return {
+      contributionClasses: [],
+    };
+  },
+  created() {
+    // fetch the contribution classes
+    this.$axios.get('/contributionClass')
+      .then((response) => {
+        response.data.forEach((contributionClass) => {
+          this.contributionClasses.push(contributionClass);
+        });
+      })
+      .catch(() => this.$emit('showError', 'Something went wrong!'));
+  },
+};
 </script>
 
 <style scoped>

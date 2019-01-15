@@ -1,20 +1,5 @@
 <template>
   <div>
-    <!-- success alert -->
-    <v-alert :value="showSuccess"
-             type="success"
-             dismissible
-    >
-      The contribution class was saved successfully.
-    </v-alert>
-
-    <!-- error alert -->
-    <v-alert :value="showError"
-             type="error"
-    >
-      An error occurs.
-    </v-alert>
-
     <!-- remove dialog -->
     <v-dialog v-model="showDeleteDialog" persistent max-width="400">
       <v-card>
@@ -129,130 +114,138 @@
 </template>
 
 <script>
-  export default {
-    name: "ShowContributionClass",
-    data() {
-      return {
-        id: null,
-        name: null,
-        form: {
-          valid: true,
-          cards: {
-            generalInformation: {
-              title: 'General information',
-              inputs: {
-                name: {
-                  label: 'Name',
-                  type: 'text',
-                  value: '',
-                  counter: 200,
-                  hint: '*required',
-                  rules: [
-                    v => !!v || 'Forename is required',
-                    v => (v.length >= 1 && v.length <= 200)
-                      || 'Name must have less than 200 character',
-                  ],
-                },
+export default {
+  name: 'ShowContributionClass',
+  data() {
+    return {
+      id: null,
+      name: null,
+      form: {
+        valid: true,
+        cards: {
+          generalInformation: {
+            title: 'General information',
+            inputs: {
+              name: {
+                label: 'Name',
+                type: 'text',
+                value: '',
+                counter: 200,
+                hint: '*required',
+                rules: [
+                  v => !!v || 'Forename is required',
+                  v => (v.length >= 1 && v.length <= 200)
+                    || 'Name must have less than 200 character',
+                ],
               },
             },
-            contributionInformation: {
-              title: 'Contribution',
-              inputs: {
-                baseContribution: {
-                  label: 'Base contribution',
-                  type: 'text',
-                  value: '',
-                  hint: '*required',
-                  prependIcon: 'euro_symbol',
-                  rules: [
-                    v => !!v || 'Base contribution is required',
-                    v => this.numberPattern.test(v) || 'Invalid format! Must be X.XX',
-                  ],
-                },
-                additionalContribution: {
-                  label: 'Additional contribution',
-                  type: 'text',
-                  value: '',
-                  hint: '*required',
-                  prependIcon: 'euro_symbol',
-                  rules: [
-                    v => !!v || 'Additional contribution is required',
-                    v => this.numberPattern.test(v) || 'Invalid format! Must be X.XX',
-                  ],
-                },
+          },
+          contributionInformation: {
+            title: 'Contribution',
+            inputs: {
+              baseContribution: {
+                label: 'Base contribution',
+                type: 'text',
+                value: '',
+                hint: '*required',
+                prependIcon: 'euro_symbol',
+                rules: [
+                  v => !!v || 'Base contribution is required',
+                  v => this.numberPattern.test(v) || 'Invalid format! Must be X.XX',
+                ],
+              },
+              additionalContribution: {
+                label: 'Additional contribution',
+                type: 'text',
+                value: '',
+                hint: '*required',
+                prependIcon: 'euro_symbol',
+                rules: [
+                  v => !!v || 'Additional contribution is required',
+                  v => this.numberPattern.test(v) || 'Invalid format! Must be X.XX',
+                ],
               },
             },
           },
         },
-        numberPattern: /^[0-9]+\.[0-9][0-9]$/,
-        color: 'green',
-        showSuccess: false,
-        showError: false,
-        openSpeedDial: false,
-        showDeleteDialog: false,
-        fab: false,
-      };
-    },
-    created() {
-      // fetch the contribution classes
-      this.$axios.get(`/contributionClass/${this.$route.params.id}`)
-        .then((response) => this.setContributionClass(response.data))
-        .catch(() => this.showError = true);
-    },
-    methods: {
-      /**
-       * Validates all inputs and submits the form
-       */
-      submit() {
-        this.showSuccess = false;
-        if (this.$refs.form.validate()) {
-          this.$axios.put('/contributionClass', {
-            id: this.id,
-            name: this.form.cards.generalInformation.inputs.name.value,
-            baseContribution: this.form.cards.contributionInformation.inputs.baseContribution.value,
-            additionalContribution: this.form.cards
-              .contributionInformation.inputs.additionalContribution.value,
+      },
+      numberPattern: /^[0-9]+\.[0-9][0-9]$/,
+      color: 'green',
+      openSpeedDial: false,
+      showDeleteDialog: false,
+      fab: false,
+    };
+  },
+  created() {
+    // fetch the contribution classes
+    this.$axios.get(`/contributionClass/${this.$route.params.id}`)
+      .then((response) => {
+        this.setContributionClass(response.data);
+      })
+      .catch(() => {
+        this.$emit('message', 'Something went wrong.', 'error');
+      });
+  },
+  methods: {
+    /**
+     * Validates all inputs and submits the form
+     */
+    submit() {
+      if (this.$refs.form.validate()) {
+        this.$axios.put('/contributionClass', {
+          id: this.id,
+          name: this.form.cards.generalInformation.inputs.name.value,
+          baseContribution: this.form.cards.contributionInformation.inputs.baseContribution.value,
+          additionalContribution: this.form.cards
+            .contributionInformation.inputs.additionalContribution.value,
+        })
+          .then((response) => {
+            this.$emit('message', 'Saved successfully.', 'success');
+            this.setContributionClass(response.data);
           })
-            .then((response) => {
-              this.showSuccess = true;
-              this.setContributionClass(response.data)
-            })
-            .catch(() => this.showError = true);
-        }
-      },
-      /**
-       * Removes the contribution class from the database.
-       */
-      remove() {
-        this.showDeleteDialog = false;
-
-        this.$axios.delete(`/contributionClass/${this.id}`)
-          .then(() => this.$router.push({name: 'indexContributionClass'}))
-          .catch(() => this.showError = true);
-      },
-      /**
-       * Applies the given contribution class to this view.
-       *
-       * @param contributionClass the contribution class to apply
-       */
-      setContributionClass(contributionClass) {
-        // id
-        this.id = contributionClass.id;
-
-        // name
-        this.form.cards.generalInformation.inputs.name.value = contributionClass.name;
-        this.name = contributionClass.name;
-
-        // base contribution
-        this.form.cards.contributionInformation.inputs.baseContribution.value =
-          (contributionClass.baseContribution).toFixed(2);
-
-        // additional contribution
-        this.form.cards.contributionInformation.inputs.additionalContribution.value =
-          (contributionClass.additionalContribution).toFixed(2);
+          .catch(() => {
+            this.$emit('message', 'Something went wrong.', 'error');
+            this.showError = true;
+          });
       }
-    }
-  }
+    },
+    /**
+     * Removes the contribution class from the database.
+     */
+    remove() {
+      this.showDeleteDialog = false;
+
+      this.$axios.delete(`/contributionClass/${this.id}`)
+        .then(() => this.$router.push({
+          name: 'indexContributionClass',
+        }))
+        .catch(() => {
+          this.showError = true;
+        });
+    },
+    /**
+     * Applies the given contribution class to this view.
+     *
+     * @param contributionClass the contribution class to apply
+     */
+    setContributionClass(contributionClass) {
+      // id
+      this.id = contributionClass.id;
+
+      // name
+      this.form.cards.generalInformation.inputs.name.value = contributionClass.name;
+      this.name = contributionClass.name;
+
+      // base contribution
+      this.form.cards.contributionInformation
+        .inputs.baseContribution.value = (contributionClass.baseContribution).toFixed(2);
+
+      // additional contribution
+      this.form.cards.contributionInformation.inputs
+        .additionalContribution.value = (contributionClass.additionalContribution).toFixed(2);
+    },
+  },
+};
 </script>
 
 <style scoped>
