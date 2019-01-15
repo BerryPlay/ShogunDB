@@ -1,12 +1,15 @@
 // import stylesheets
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
+
 // relative imports
 import Vue from 'vue';
 import '@babel/polyfill';
+
 // absolute imports
 import './plugins/axios';
 import './plugins/vuetify';
+import i18n from './i18n';
 import App from './App.vue';
 import router from './router';
 
@@ -32,5 +35,6 @@ router.beforeEach((to, from, next) => {
 
 new Vue({
   router,
+  i18n,
   render: h => h(App),
 }).$mount('#app');

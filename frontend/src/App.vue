@@ -74,6 +74,9 @@ export default {
       },
     };
   },
+  created() {
+    this.$i18n.locale = 'de';
+  },
   methods: {
     /**
      * Removes the authentication token from the local storage and sets the authentication flag to

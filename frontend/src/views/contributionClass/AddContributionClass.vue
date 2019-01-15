@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Add new contribution class</h1>
+    <h1>{{$t('contributionClass.addNewContributionClass')}}</h1>
 
     <v-form lazy-validation
             ref="form"
@@ -93,16 +93,16 @@ export default {
         valid: true,
         cards: {
           generalInformation: {
-            title: 'General information',
+            title: this.$t('contributionClass.generalInformation'),
             inputs: {
               name: {
-                label: 'Name',
+                label: this.$t('name'),
                 type: 'text',
                 value: '',
                 counter: 200,
-                hint: '*required',
+                hint: `*${this.$t('required')}`,
                 rules: [
-                  v => !!v || 'Forename is required',
+                  v => !!v || this.$t('nameRequired'),
                   v => (v.length >= 1 && v.length <= 200)
                     || 'Name must have less than 200 character',
                 ],
@@ -110,28 +110,30 @@ export default {
             },
           },
           contributionInformation: {
-            title: 'Contribution',
+            title: this.$t('contributionClass.contribution'),
             inputs: {
               baseContribution: {
-                label: 'Base contribution',
+                label: this.$t('contributionClass.baseContribution'),
                 type: 'text',
                 value: '',
-                hint: '*required',
+                hint: `*${this.$t('required')}`,
                 prependIcon: 'euro_symbol',
                 rules: [
-                  v => !!v || 'Base contribution is required',
-                  v => this.numberPattern.test(v) || 'Invalid format! Must be X.XX',
+                  v => !!v || this.$t('contributionClass.baseContributionRequired'),
+                  v => this.numberPattern.test(v)
+                    || this.$t('contributionClass.wrongContributionFormat'),
                 ],
               },
               additionalContribution: {
-                label: 'Additional contribution',
+                label: this.$t('contributionClass.additionalContribution'),
                 type: 'text',
                 value: '',
-                hint: '*required',
+                hint: `*${this.$t('required')}`,
                 prependIcon: 'euro_symbol',
                 rules: [
-                  v => !!v || 'Additional contribution is required',
-                  v => this.numberPattern.test(v) || 'Invalid format! Must be X.XX',
+                  v => !!v || this.$t('contributionClass.additionalContributionRequired'),
+                  v => this.numberPattern.test(v)
+                    || this.$t('contributionClass.wrongContributionFormat'),
                 ],
               },
             },
@@ -150,7 +152,11 @@ export default {
       if (this.$refs.form.validate()) {
         this.$axios.post('/contributionClass', this.contributionClass)
           .then((response) => {
-            this.$emit('message', 'Contribution class was added successfully.', 'success');
+            this.$emit(
+              'message',
+              this.$t('contributionClass.addNewContributionClassSuccessMessage'),
+              'success',
+            );
             this.$router.push({
               name: 'showContributionClass',
               params: {
@@ -159,7 +165,7 @@ export default {
             });
           })
           .catch(() => {
-            this.$emit('message', 'Something went wrong.', 'error');
+            this.$emit('message', this.$t('messages.errorDefault'), 'error');
           })
           .finally(() => {
             this.loading = false;

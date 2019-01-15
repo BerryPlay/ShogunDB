@@ -1,0 +1,26 @@
+{
+  "message": "Deutsch",
+  "name": "Name",
+  "nameRequired": "Name ist erforderlich",
+  "required": "erforderlich",
+  "menu": {
+    "addNew": "Add new",
+    "showAll": "Show all",
+    "search": "Search"
+  },
+  "messages": {
+    "errorDefault": "Etwas ist schiefgelaufen"
+  },
+  "contributionClass": {
+    "contributionClass": "Beitragsklasse",
+    "addNewContributionClass": "Neue Beitragsklasse hinzufügen",
+    "addNewContributionClassSuccessMessage": "Neue Beitragsklasse wurde erfolgreich hinzugefügt",
+    "generalInformation": "Allgemein",
+    "contribution": "Beitrag",
+    "baseContribution": "Grundbeitrag",
+    "additionalContribution": "Beitrag für weitere Disziplinen",
+    "baseContributionRequired": "Grundbeitrag ist erforderlich",
+    "additionalContributionRequired": "Beitrag für weitere Disziplinen ist erforderlich",
+    "wrongContributionFormat": "Beitrag muss die Form X.XX haben"
+  }
+}

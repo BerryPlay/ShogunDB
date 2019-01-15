@@ -1,7 +1,15 @@
 <template>
-  <h1>Hey</h1>
+  <div>
+    <h1>{{$t('message')}}</h1>
+    <v-btn @click="$i18n.locale = 'en'">en</v-btn>
+    <v-btn @click="$i18n.locale = 'de'">de</v-btn>
+  </div>
 </template>
 
 <script>
-export default {};
+export default {
+  created() {
+    this.$i18n.locale = 'de';
+  },
+};
 </script>
