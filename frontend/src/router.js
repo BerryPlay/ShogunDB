@@ -27,6 +27,7 @@ export default new Router({
         noAuth: true,
       },
     },
+
     // contribution class routes
     {
       path: '/contributionClass/add',
@@ -43,12 +44,25 @@ export default new Router({
       name: 'showContributionClass',
       component: () => import('./views/contributionClass/ShowContributionClass.vue'),
     },
+
     // discipline routes
     {
       path: '/discipline/add',
       name: 'addDiscipline',
       component: () => import('./views/discipline/AddDiscipline.vue'),
     },
+    {
+      path: '/discipline/index',
+      name: 'indexDiscipline',
+      component: () => import('./views/discipline/IndexDiscipline.vue'),
+    },
+    {
+      path: '/discipline/show/:id',
+      name: 'showDiscipline',
+      component: () => import('./views/discipline/ShowDiscipline.vue'),
+    },
+
+    // member routes
     {
       path: '/member/add',
       name: 'addMember',

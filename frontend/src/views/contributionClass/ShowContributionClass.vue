@@ -4,20 +4,21 @@
     <v-dialog v-model="showDeleteDialog" persistent max-width="400">
       <v-card>
         <v-card-title>
-          <h2>Delete contribution class?</h2>
+          <h2>{{$t('contributionClass.delete.title')}}</h2>
         </v-card-title>
 
         <v-card-text>
-          <b>Warning:</b> the contribution class will be removed from the database! Are you sure?
+          <b>{{$t('contributionClass.delete.warning')}}</b>
+          {{$t('contributionClass.delete.body')}}
           <div align="right">
             <v-btn @click="showDeleteDialog = false">
-              no
+              {{$t('phrases.no')}}
             </v-btn>
             <v-btn color="error"
                    dark
                    @click="remove"
             >
-              yes
+              {{$t('phrases.yes')}}
             </v-btn>
           </div>
         </v-card-text>
@@ -25,91 +26,89 @@
     </v-dialog>
 
     <!-- content -->
-    <div v-if="!showError">
-      <h1>Contribution class {{name}}</h1>
+    <h1>{{$t('contributionClass.singular')}}: {{name}}</h1>
 
-      <v-form lazy-validation
-              ref="form"
-              v-model="form.valid"
-      >
-        <v-card>
-          <v-card-text>
-            <v-layout row wrap>
-              <v-flex :key="i"
-                      class="px-2 py-2"
-                      md6
-                      sm12
-                      v-for="(card, i) in form.cards"
-                      xl6
-                      xs12
+    <v-form lazy-validation
+            ref="form"
+            v-model="form.valid"
+    >
+      <v-card>
+        <v-card-text>
+          <v-layout row wrap>
+            <v-flex :key="i"
+                    class="px-2 py-2"
+                    md6
+                    sm12
+                    v-for="(card, i) in form.cards"
+                    xl6
+                    xs12
+            >
+              <h3 v-if="card.title !== null">{{card.title}}</h3>
+              <div :key="`${card.title}_${fieldIndex}`"
+                   v-for="(input, fieldIndex) in card.inputs"
               >
-                <h3 v-if="card.title !== null">{{card.title}}</h3>
-                <div :key="`${card.title}_${fieldIndex}`"
-                     v-for="(input, fieldIndex) in card.inputs"
-                >
-                  <!-- text input -->
-                  <v-text-field :counter="input.counter"
-                                :hint="input.hint"
-                                :label="input.label"
-                                :rules="input.rules"
-                                v-if="input.type === 'text'"
-                                v-model="input.value"
-                                :color="color"
-                                :append-icon="input.appendIcon"
-                                :prepend-icon="input.prependIcon"
-                  ></v-text-field>
+                <!-- text input -->
+                <v-text-field :counter="input.counter"
+                              :hint="input.hint"
+                              :label="input.label"
+                              :rules="input.rules"
+                              v-if="input.type === 'text'"
+                              v-model="input.value"
+                              :color="color"
+                              :append-icon="input.appendIcon"
+                              :prepend-icon="input.prependIcon"
+                ></v-text-field>
 
-                  <!-- number input -->
-                  <v-text-field :counter="input.counter"
-                                :hint="input.hint"
-                                :label="input.label"
-                                :rules="input.rules"
-                                v-if="input.type === 'number'"
-                                type="number"
-                                v-model="input.value"
-                                :color="color"
-                                :append-icon="input.appendIcon"
-                                :prepend-icon="input.prependIcon"
-                  ></v-text-field>
-                </div>
-              </v-flex>
-            </v-layout>
-          </v-card-text>
-        </v-card>
+                <!-- number input -->
+                <v-text-field :counter="input.counter"
+                              :hint="input.hint"
+                              :label="input.label"
+                              :rules="input.rules"
+                              v-if="input.type === 'number'"
+                              type="number"
+                              v-model="input.value"
+                              :color="color"
+                              :append-icon="input.appendIcon"
+                              :prepend-icon="input.prependIcon"
+                ></v-text-field>
+              </div>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+      </v-card>
 
-        <v-speed-dial v-model="openSpeedDial"
-                      bottom
-                      right
-                      fixed
+      <v-speed-dial v-model="openSpeedDial"
+                    bottom
+                    right
+                    fixed
+      >
+        <v-btn slot="activator"
+               v-model="fab"
+               :color="color"
+               dark
+               fab
         >
-          <v-btn slot="activator"
-                 v-model="fab"
-                 :color="color"
-                 dark
-                 fab
-          >
-            <v-icon>more_vert</v-icon>
-            <v-icon>close</v-icon>
-          </v-btn>
-          <v-btn fab
-                 dark
-                 small
-                 color="blue"
-                 @click="submit"
-          >
-            <v-icon>save</v-icon>
-          </v-btn>
-          <v-btn fab
-                 dark
-                 small
-                 color="red"
-                 @click="showDeleteDialog = true"
-          >
-            <v-icon>delete</v-icon>
-          </v-btn>
-        </v-speed-dial>
-      </v-form>
-    </div>
+          <v-icon>more_vert</v-icon>
+          <v-icon>close</v-icon>
+        </v-btn>
+        <v-btn fab
+               dark
+               small
+               color="blue"
+               @click="submit"
+        >
+          <v-icon>save</v-icon>
+        </v-btn>
+        <v-btn fab
+               dark
+               small
+               color="red"
+               @click="showDeleteDialog = true"
+        >
+          <v-icon>delete</v-icon>
+        </v-btn>
+      </v-speed-dial>
+    </v-form>
   </div>
 </template>
 
@@ -124,45 +123,47 @@ export default {
         valid: true,
         cards: {
           generalInformation: {
-            title: 'General information',
+            title: this.$t('contributionClass.categories.general'),
             inputs: {
               name: {
-                label: 'Name',
+                label: this.$t('contributionClass.name.label'),
                 type: 'text',
                 value: '',
                 counter: 200,
-                hint: '*required',
+                hint: this.$t('contributionClass.name.hint'),
                 rules: [
-                  v => !!v || 'Forename is required',
+                  v => !!v || this.$t('contributionClass.name.required'),
                   v => (v.length >= 1 && v.length <= 200)
-                    || 'Name must have less than 200 character',
+                    || this.$t('contributionClass.name.length'),
                 ],
               },
             },
           },
           contributionInformation: {
-            title: 'Contribution',
+            title: this.$t('contributionClass.categories.contribution'),
             inputs: {
               baseContribution: {
-                label: 'Base contribution',
+                label: this.$t('contributionClass.base.label'),
                 type: 'text',
                 value: '',
-                hint: '*required',
-                prependIcon: 'euro_symbol',
+                hint: this.$t('contributionClass.base.hint'),
+                prependIcon: 'fas fa-euro-sign',
                 rules: [
-                  v => !!v || 'Base contribution is required',
-                  v => this.numberPattern.test(v) || 'Invalid format! Must be X.XX',
+                  v => !!v || this.$t('contributionClass.base.required'),
+                  v => this.numberPattern.test(v)
+                    || this.$t('contributionClass.base.format'),
                 ],
               },
               additionalContribution: {
-                label: 'Additional contribution',
+                label: this.$t('contributionClass.additional.label'),
                 type: 'text',
                 value: '',
-                hint: '*required',
+                hint: this.$t('contributionClass.additional.hint'),
                 prependIcon: 'euro_symbol',
                 rules: [
-                  v => !!v || 'Additional contribution is required',
-                  v => this.numberPattern.test(v) || 'Invalid format! Must be X.XX',
+                  v => !!v || this.$t('contributionClass.additional.required'),
+                  v => this.numberPattern.test(v)
+                    || this.$t('contributionClass.additional.format'),
                 ],
               },
             },
@@ -188,7 +189,7 @@ export default {
   },
   methods: {
     /**
-     * Validates all inputs and submits the form
+     * Validates all inputs and submits the form.
      */
     submit() {
       if (this.$refs.form.validate()) {
@@ -200,12 +201,11 @@ export default {
             .contributionInformation.inputs.additionalContribution.value,
         })
           .then((response) => {
-            this.$emit('message', 'Saved successfully.', 'success');
+            this.$emit('message', this.$t('contributionClass.save.success'), 'success');
             this.setContributionClass(response.data);
           })
           .catch(() => {
-            this.$emit('message', 'Something went wrong.', 'error');
-            this.showError = true;
+            this.$emit('message', this.$t('messages.errorDefault'), 'error');
           });
       }
     },
@@ -220,7 +220,7 @@ export default {
           name: 'indexContributionClass',
         }))
         .catch(() => {
-          this.showError = true;
+          this.$emit('message', this.$('messages.errorDefault'), 'error');
         });
     },
     /**

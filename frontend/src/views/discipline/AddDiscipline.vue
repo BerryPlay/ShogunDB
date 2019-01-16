@@ -1,13 +1,13 @@
 <template>
   <div>
-    <h1>Add new discipline</h1>
+    <h1>{{$t('discipline.add.title')}}</h1>
     <v-form lazy-validation
             ref="form"
     >
       <v-card>
         <v-card-text>
           <v-text-field counter="200"
-                        hint="*required"
+                        :hint="hint"
                         label="Name"
                         :rules="rules"
                         v-model="name"
@@ -35,10 +35,11 @@ export default {
   data() {
     return {
       name: '',
+      hint: this.$t('discipline.name.hint'),
       rules: [
-        v => !!v || 'Name is required',
+        v => !!v || this.$t('discipline.name.required'),
         v => (v.length >= 1 && v.length <= 200)
-          || 'Forename must have less than 200 character',
+          || this.$t('discipline.name.length'),
       ],
       color: 'blue',
     };
@@ -52,11 +53,17 @@ export default {
         this.$axios.post('/discipline', {
           name: this.name,
         })
-          .then(() => {
-            this.$emit('message', 'Discipline was added successfully.', 'success');
+          .then((response) => {
+            this.$emit('message', this.$t('discipline.add.success'), 'success');
+            this.$router.push({
+              name: 'showDiscipline',
+              params: {
+                id: response.data.id,
+              },
+            });
           })
           .catch(() => {
-            this.$emit('message', 'Something went wrong.', 'error');
+            this.$emit('message', this.$t('messages.errorDefault'), 'error');
           })
           .finally(() => {
             this.loading = false;

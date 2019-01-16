@@ -1,26 +1,82 @@
 {
+  "phrases": {
+    "yes": "Ja",
+    "no": "Nein"
+  },
   "message": "Deutsch",
   "name": "Name",
   "nameRequired": "Name ist erforderlich",
   "required": "erforderlich",
   "menu": {
-    "addNew": "Add new",
-    "showAll": "Show all",
-    "search": "Search"
+    "addNew": "Hinzufügen",
+    "showAll": "Alle anzeigen",
+    "search": "Suchen"
   },
   "messages": {
     "errorDefault": "Etwas ist schiefgelaufen"
   },
   "contributionClass": {
-    "contributionClass": "Beitragsklasse",
-    "addNewContributionClass": "Neue Beitragsklasse hinzufügen",
-    "addNewContributionClassSuccessMessage": "Neue Beitragsklasse wurde erfolgreich hinzugefügt",
-    "generalInformation": "Allgemein",
-    "contribution": "Beitrag",
-    "baseContribution": "Grundbeitrag",
-    "additionalContribution": "Beitrag für weitere Disziplinen",
-    "baseContributionRequired": "Grundbeitrag ist erforderlich",
-    "additionalContributionRequired": "Beitrag für weitere Disziplinen ist erforderlich",
-    "wrongContributionFormat": "Beitrag muss die Form X.XX haben"
+    "singular": "Beitragsklasse",
+    "plural": "Beitragsklassen",
+    "add": {
+      "title": "Neue Beitragsklasse hinzufügen",
+      "success": "Neue Beitragsklasse wurde erfolgreich hinzugefügt"
+    },
+    "save": {
+      "success": "Erfolgreich gespeichert"
+    },
+    "name": {
+      "label": "Name",
+      "hint": "*erforderlich",
+      "required": "Name ist erforderlich",
+      "length": "Der Name darf nicht mehr als 200 Zeichen lang sein"
+    },
+    "base": {
+      "label": "Grundbeitrag",
+      "hint": "*erforderlich",
+      "required": "Grundbeitrag ist erforderlich",
+      "format": "Beitrag muss die Form X.XX haben"
+    },
+    "additional": {
+      "label": "Beitrag für weitere Disziplinen",
+      "hint": "*erforderlich",
+      "required": "Beitrag für weitere Disziplinen ist erforderlich",
+      "format": "Beitrag muss die Form X.XX haben"
+    },
+    "categories": {
+      "general": "Allgemein",
+      "contribution": "Beitrag",
+      "all": "Alle Beitragsklassen"
+    },
+    "delete": {
+      "title": "Beitragsklasse löschen?",
+      "warning": "Achtung",
+      "body": "die Beitragsklasse wird unwiderruflich gelöscht! Sind Sie sich sicher?"
+    }
+  },
+  "discipline": {
+    "singular": "Disziplin",
+    "plural": "Disziplinen",
+    "add": {
+      "title": "Neue Disziplin hinzufügen",
+      "success": "Neue Disziplin wurde erfolgreich hinzugefügt"
+    },
+    "name": {
+      "label": "Name der Disziplin",
+      "hint": "*erforderlich",
+      "required": "Name der Disziplin ist erforderlich",
+      "length": "Der Name darf nicht mehr als 200 Zeichen lang sein"
+    },
+    "categories": {
+      "all": "Alle Disziplinen"
+    },
+    "delete": {
+      "title": "Disciplin wirklich löschen?",
+      "warning": "Achtung",
+      "body": "die Disziplin wird unwiderruflich gelöscht! Sind Sie sich sicher?"
+    },
+    "save": {
+      "success": "Erfolgreich gespeichert"
+    }
   }
 }

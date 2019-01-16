@@ -1,4 +1,8 @@
 {
+  "phrases": {
+    "yes": "Yes",
+    "no": "No"
+  },
   "message": "English",
   "name": "Name",
   "nameRequired": "Name is required",
@@ -12,15 +16,67 @@
     "errorDefault": "Something went wrong"
   },
   "contributionClass": {
-    "contributionClass": "Contribution class",
-    "addNewContributionClass": "Add new contribution class",
-    "addNewContributionClassSuccessMessage": "New contribution class was added successfully",
-    "generalInformation": "General information",
-    "contribution": "Contribution",
-    "baseContribution": "Base contribution",
-    "additionalContribution": "Contribution for additional disciplines",
-    "baseContributionRequired": "Base contribution is required",
-    "additionalContributionRequired": "Additional contribution is required",
-    "wrongContributionFormat": "Invalid format! Must be X.XX"
+    "singular": "Contribution class",
+    "plural": "Contribution classes",
+    "add": {
+      "title": "Add new contribution class",
+      "success": "New contribution class was added successfully"
+    },
+    "save": {
+      "success": "Saved successfully"
+    },
+    "name": {
+      "label": "Name",
+      "hint": "*erforderlich",
+      "required": "Name is required",
+      "length": "Name must have less than 200 character"
+    },
+    "base": {
+      "label": "Base contribution",
+      "hint": "*required",
+      "required": "Base contribution is required",
+      "format": "Invalid format! Must be X.XX"
+    },
+    "additional": {
+      "label": "Contribution for additional disciplines",
+      "hint": "*required",
+      "required": "Additional contribution is required",
+      "format": "Invalid format! Must be X.XX"
+    },
+    "categories": {
+      "general": "General information",
+      "contribution": "Contribution",
+      "all": "All contribution classes"
+    },
+    "delete": {
+      "title": "Delete contribution class?",
+      "warning": "Warning",
+      "body": "the contribution class will be removed from the database! Are you sure?"
+    }
+  },
+  "discipline": {
+    "singular": "Disziplin",
+    "plural": "Disziplinen",
+    "name": {
+      "label": "Name of the discipline",
+      "hint": "*required",
+      "required": "Name of the discipline is required",
+      "length": "Name must have less than 200 character"
+    },
+    "categories": {
+      "all": "All disciplines"
+    },
+    "delete": {
+      "title": "Delete discipline?",
+      "warning": "Warning",
+      "body": "the discipline will be removed from the database! Are you sure?"
+    },
+    "add": {
+      "title": "Add new discipline",
+      "success": "New discipline was added successfully"
+    },
+    "save": {
+      "success": "Saved successfully"
+    }
   }
 }

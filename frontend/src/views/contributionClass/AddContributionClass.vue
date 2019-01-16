@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>{{$t('contributionClass.addNewContributionClass')}}</h1>
+    <h1>{{$t('contributionClass.add.title')}}</h1>
 
     <v-form lazy-validation
             ref="form"
@@ -93,47 +93,47 @@ export default {
         valid: true,
         cards: {
           generalInformation: {
-            title: this.$t('contributionClass.generalInformation'),
+            title: this.$t('contributionClass.categories.general'),
             inputs: {
               name: {
-                label: this.$t('name'),
+                label: this.$t('contributionClass.name.label'),
                 type: 'text',
                 value: '',
                 counter: 200,
-                hint: `*${this.$t('required')}`,
+                hint: this.$t('contributionClass.name.hint'),
                 rules: [
-                  v => !!v || this.$t('nameRequired'),
+                  v => !!v || this.$t('contributionClass.name.required'),
                   v => (v.length >= 1 && v.length <= 200)
-                    || 'Name must have less than 200 character',
+                    || this.$t('contributionClass.name.length'),
                 ],
               },
             },
           },
           contributionInformation: {
-            title: this.$t('contributionClass.contribution'),
+            title: this.$t('contributionClass.categories.contribution'),
             inputs: {
               baseContribution: {
-                label: this.$t('contributionClass.baseContribution'),
+                label: this.$t('contributionClass.base.label'),
                 type: 'text',
                 value: '',
-                hint: `*${this.$t('required')}`,
-                prependIcon: 'euro_symbol',
+                hint: this.$t('contributionClass.base.hint'),
+                prependIcon: 'fas fa-euro-sign',
                 rules: [
-                  v => !!v || this.$t('contributionClass.baseContributionRequired'),
+                  v => !!v || this.$t('contributionClass.base.required'),
                   v => this.numberPattern.test(v)
-                    || this.$t('contributionClass.wrongContributionFormat'),
+                    || this.$t('contributionClass.base.format'),
                 ],
               },
               additionalContribution: {
-                label: this.$t('contributionClass.additionalContribution'),
+                label: this.$t('contributionClass.additional.label'),
                 type: 'text',
                 value: '',
-                hint: `*${this.$t('required')}`,
+                hint: this.$t('contributionClass.additional.hint'),
                 prependIcon: 'euro_symbol',
                 rules: [
-                  v => !!v || this.$t('contributionClass.additionalContributionRequired'),
+                  v => !!v || this.$t('contributionClass.additional.required'),
                   v => this.numberPattern.test(v)
-                    || this.$t('contributionClass.wrongContributionFormat'),
+                    || this.$t('contributionClass.additional.format'),
                 ],
               },
             },
@@ -152,11 +152,7 @@ export default {
       if (this.$refs.form.validate()) {
         this.$axios.post('/contributionClass', this.contributionClass)
           .then((response) => {
-            this.$emit(
-              'message',
-              this.$t('contributionClass.addNewContributionClassSuccessMessage'),
-              'success',
-            );
+            this.$emit('message', this.$t('contributionClass.add.success'), 'success');
             this.$router.push({
               name: 'showContributionClass',
               params: {

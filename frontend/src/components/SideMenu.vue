@@ -85,18 +85,18 @@ export default {
       groups: [
         {
           name: 'Member',
-          icon: 'people',
+          icon: 'fas fa-users',
           items: [
             {
               label: 'Add new',
-              icon: 'person_add',
+              icon: 'fas fa-user-plus',
               route: {
                 name: 'addMember',
               },
             },
             {
               label: 'Search',
-              icon: 'search',
+              icon: 'fas fa-search',
               route: {
                 name: 'searchMember',
               },
@@ -105,18 +105,18 @@ export default {
         },
         {
           name: 'Seminars',
-          icon: 'school',
+          icon: 'fas fa-graduation-cap',
           items: [
             {
               label: 'Add new',
-              icon: 'add',
+              icon: 'fas fa-plus',
               route: {
                 name: 'about',
               },
             },
             {
               label: 'Search',
-              icon: 'search',
+              icon: 'fas fa-search',
               route: {
                 name: 'dashboard',
               },
@@ -129,25 +129,32 @@ export default {
           items: [
             {
               label: 'Add new',
-              icon: 'add',
+              icon: 'fas fa-plus',
               route: 'Route',
             },
             {
               label: 'Search',
-              icon: 'search',
+              icon: 'fas fa-search',
               route: 'Route',
             },
           ],
         },
         {
           name: 'Discipline',
-          icon: 'rowing',
+          icon: 'fas fa-running',
           items: [
             {
               label: 'Add new',
-              icon: 'add',
+              icon: 'fas fa-plus',
               route: {
                 name: 'addDiscipline',
+              },
+            },
+            {
+              label: 'Show all',
+              icon: 'fas fa-list-ul',
+              route: {
+                name: 'indexDiscipline',
               },
             },
           ],
@@ -165,7 +172,7 @@ export default {
             },
             {
               label: 'Show all',
-              icon: 'view_list',
+              icon: 'fas fa-list-ul',
               route: {
                 name: 'indexContributionClass',
               },

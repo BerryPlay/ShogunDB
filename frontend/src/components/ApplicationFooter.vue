@@ -15,6 +15,7 @@
           Visit ShogunDB on
           <a href="https://github.com/BerryPlay/ShogunDB" target="_blank">
             Github
+            <v-icon>fab fa-github</v-icon>
           </a>
         </strong>
         <v-icon></v-icon>
