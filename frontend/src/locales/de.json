@@ -15,6 +15,11 @@
   "messages": {
     "errorDefault": "Etwas ist schiefgelaufen"
   },
+  "table": {
+    "empty": "Keine Daten vorhanden",
+    "result": "Keine Elemente gefunden",
+    "rows": "Zeilen pro Seite:"
+  },
   "contributionClass": {
     "singular": "Beitragsklasse",
     "plural": "Beitragsklassen",
@@ -68,7 +73,8 @@
       "length": "Der Name darf nicht mehr als 200 Zeichen lang sein"
     },
     "categories": {
-      "all": "Alle Disziplinen"
+      "all": "Alle Disziplinen",
+      "edit": "Bearbeiten"
     },
     "delete": {
       "title": "Disciplin wirklich löschen?",
@@ -77,6 +83,14 @@
     },
     "save": {
       "success": "Erfolgreich gespeichert"
+    },
+    "member": {
+      "title": "Mitglieder der Disziplin",
+      "id": "Nr.",
+      "forename": "Vorname",
+      "surname": "Nachname",
+      "age": "Alter",
+      "search": "Mitglied suchen"
     }
   }
 }

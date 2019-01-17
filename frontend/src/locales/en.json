@@ -15,6 +15,11 @@
   "messages": {
     "errorDefault": "Something went wrong"
   },
+  "table": {
+    "empty": "No data available",
+    "result": "No results found",
+    "rows": "Rows per page:"
+  },
   "contributionClass": {
     "singular": "Contribution class",
     "plural": "Contribution classes",
@@ -77,6 +82,14 @@
     },
     "save": {
       "success": "Saved successfully"
+    },
+    "member": {
+      "title": "Members of the discipline",
+      "id":"No.",
+      "forename": "Forename",
+      "surname": "Surname",
+      "age": "Age",
+      "search": "Search member"
     }
   }
 }
