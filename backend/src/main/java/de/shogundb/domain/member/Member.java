@@ -76,13 +76,13 @@ public class Member extends BaseEntity {
     @NotNull
     private LocalDate enteredDate;
 
-    @NotNull
-    private Boolean hasLeft;
+    @Builder.Default
+    private Boolean hasLeft = false;
 
     private LocalDate leftDate;
 
-    @NotNull
-    private Boolean isPassive;
+    @Builder.Default
+    private Boolean isPassive = false;
 
     @ManyToOne
     private ContributionClass contributionClass;
