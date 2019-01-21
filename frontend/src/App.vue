@@ -43,11 +43,11 @@
 </template>
 
 <script>
-import ApplicationFooter from './components/ApplicationFooter.vue';
-import Navbar from './components/Navbar.vue';
-import SideMenu from './components/SideMenu.vue';
+  import ApplicationFooter from './components/ApplicationFooter.vue';
+  import Navbar from './components/Navbar.vue';
+  import SideMenu from './components/SideMenu.vue';
 
-export default {
+  export default {
   name: 'App',
   components: {
     ApplicationFooter,
@@ -73,9 +73,6 @@ export default {
         timeout: 3000,
       },
     };
-  },
-  created() {
-    this.$i18n.locale = 'de';
   },
   methods: {
     /**

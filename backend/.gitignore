@@ -1,1 +1,5 @@
+# frontend code (will be copied automatically while building the application)
 src/main/resources/public/*
+
+# application configuration file
+application.yaml

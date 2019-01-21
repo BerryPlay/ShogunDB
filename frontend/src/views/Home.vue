@@ -7,9 +7,5 @@
 </template>
 
 <script>
-export default {
-  created() {
-    this.$i18n.locale = 'de';
-  },
-};
+  export default {};
 </script>
