@@ -10,6 +10,7 @@ import de.shogundb.domain.seminar.Seminar;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -46,6 +47,10 @@ public class Member extends BaseEntity {
     @NotNull
     @Size(min = 3, max = 8)
     private String postcode;
+
+    @NotBlank
+    @Size(min = 1, max = 200)
+    private String city;
 
     @NotNull
     @Size(min = 4, max = 200)

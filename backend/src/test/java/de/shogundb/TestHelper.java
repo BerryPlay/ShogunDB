@@ -47,6 +47,7 @@ public class TestHelper {
                 .gender(Gender.MALE)
                 .street("Musterstraße")
                 .postcode("26721")
+                .city("Emden")
                 .phoneNumber("04929 5435438")
                 .mobileNumber("1522 416845575")
                 .email("max@muster.de")

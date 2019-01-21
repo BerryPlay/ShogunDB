@@ -87,6 +87,7 @@ public class MemberController {
                 .surname(member.getSurname())
                 .gender(member.getGender())
                 .street(member.getStreet())
+                .city(member.getCity())
                 .postcode(member.getPostcode())
                 .phoneNumber(member.getPhoneNumber())
                 .mobileNumber(member.getMobileNumber())
@@ -204,6 +205,7 @@ public class MemberController {
         existingMember.setGender(member.getGender());
         existingMember.setStreet(member.getStreet());
         existingMember.setPostcode(member.getPostcode());
+        existingMember.setCity(member.getCity());
         existingMember.setPhoneNumber(member.getPhoneNumber());
         existingMember.setMobileNumber(member.getMobileNumber());
         existingMember.setEmail(member.getEmail());
