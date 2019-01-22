@@ -48,7 +48,7 @@ public class Graduation extends BaseEntity {
     private String highlightConditions;
 
     /**
-     * The discipline where the graduation belongs to.
+     * The discipline statements the graduation belongs to.
      */
     @ManyToOne(cascade = CascadeType.ALL)
     private Discipline discipline;

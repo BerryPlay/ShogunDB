@@ -37,6 +37,9 @@ public class Discipline extends BaseEntity {
             CascadeType.DETACH,
             CascadeType.MERGE,
             CascadeType.REFRESH})
+    @JoinTable(
+            joinColumns = {@JoinColumn(name = "discipline_id")},
+            inverseJoinColumns = {@JoinColumn(name = "member_id")})
     @JsonIgnore
     @Builder.Default
     private List<Member> members = new ArrayList<>();

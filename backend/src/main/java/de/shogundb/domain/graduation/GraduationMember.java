@@ -49,7 +49,7 @@ public class GraduationMember {
     private Member member;
 
     /**
-     * The exam where the member achieved the graduation.
+     * The exam statements the member achieved the graduation.
      */
     @NotNull
     @ManyToOne(cascade = {

@@ -65,6 +65,11 @@ public class ControllerAdviceConfig extends ResponseEntityExceptionHandler {
         return ResponseEntity.notFound().build();
     }
 
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<?> handleNullPointerException(NullPointerException e) {
+        return ResponseEntity.notFound().build();
+    }
+
     @ExceptionHandler(PersonNotFoundException.class)
     public ResponseEntity<?> handlePersonNotFoundException(PersonNotFoundException e) {
         return ResponseEntity.notFound().build();
