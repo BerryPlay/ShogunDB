@@ -1,6 +1,7 @@
 package de.shogundb.conditions.statements;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import de.shogundb.conditions.DatabaseType;
 import de.shogundb.conditions.PeriodFormat;
 import de.shogundb.domain.seminar.SeminarType;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * Adds a condition with the quantity of seminars of a special type a member must have visited within a period of time.
+ * TODO: fix this condition to work with h2 and mysql
  */
 @Data
 @AllArgsConstructor
@@ -44,7 +46,7 @@ public class SeminarCondition implements Condition {
     private PeriodFormat periodFormat;
 
     @Override
-    public String getSQLStatement() {
+    public String getSQLStatement(DatabaseType databaseType) {
         return new StringBuilder()
                 .append("(")
                 .append(quantity)

@@ -3,6 +3,7 @@ package de.shogundb.conditions;
 import de.shogundb.domain.member.Member;
 import de.shogundb.domain.member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,9 @@ public class ConditionController {
     @PersistenceContext
     private EntityManager em;
 
+    @Value("${spring.jpa.database}")
+    private String databaseType;
+
     @Autowired
     public ConditionController(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
@@ -36,9 +40,9 @@ public class ConditionController {
      */
     @PostMapping
     public ResponseEntity<List<Member>> test(@RequestBody @Valid MainCondition condition) {
-        var query = em.createNativeQuery(condition.getSQLQuery(), Member.class);
+        var query = em.createNativeQuery(condition.getSQLQuery(DatabaseType.valueOf(databaseType)), Member.class);
 
-        System.out.println(condition.getSQLQuery());
+        System.out.println(condition.getSQLQuery(DatabaseType.valueOf(databaseType)));
         var res = query.getResultList();
 
         return ResponseEntity.ok().body(new ArrayList<>() {{

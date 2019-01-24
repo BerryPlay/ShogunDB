@@ -1,6 +1,7 @@
 package de.shogundb.conditions.statements;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import de.shogundb.conditions.DatabaseType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +25,7 @@ public class OrCondition implements Condition {
     private List<Condition> conditions = new ArrayList<>();
 
     @Override
-    public String getSQLStatement() {
+    public String getSQLStatement(DatabaseType databaseType) {
         var query = new StringBuilder();
 
         query.append("(");
@@ -39,7 +40,7 @@ public class OrCondition implements Condition {
                 } else {
                     firstPassed = true;
                 }
-                query.append(condition.getSQLStatement());
+                query.append(condition.getSQLStatement(databaseType));
             }
         } else {
             query.append(0);

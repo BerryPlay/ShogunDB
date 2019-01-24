@@ -25,7 +25,7 @@ public class ConditionDeserializer extends JsonDeserializer<Condition> {
             // Switch the condition type value
             switch (ConditionType.valueOf(root.get("type").asText())) {
                 case AGE:
-                    if (root.get("age").asInt() > 0) {
+                    if (root.get("minAge").asInt() <= root.get("maxAge").asInt()) {
                         return mapper.readValue(root.toString(), AgeCondition.class);
                     }
                     break;

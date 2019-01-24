@@ -1,6 +1,7 @@
 package de.shogundb.conditions.statements;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import de.shogundb.conditions.DatabaseType;
 import de.shogundb.conditions.PeriodFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,7 +39,7 @@ public class GraduationCondition implements Condition {
     private PeriodFormat periodFormat;
 
     @Override
-    public String getSQLStatement() {
+    public String getSQLStatement(DatabaseType databaseType) {
         return new StringBuilder()
                 .append("(1 = (SELECT COUNT(*) FROM graduation ")
                 .append("INNER JOIN graduation_member ON (graduation.id = graduation_member.graduation_id) ")

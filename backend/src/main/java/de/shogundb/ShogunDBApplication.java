@@ -36,4 +36,17 @@ public class ShogunDBApplication {
             }
         };
     }
+
+    /**
+     * An own implementation of the h2 'DATEDIFF' method (which doesn't work properly). Calculates the period of time
+     * between date one and two.
+     *
+     * @param unit  the unit ('YEARS', 'MONTH' or 'DAYS')
+     * @param date1 the lower date
+     * @param date2 the upper date
+     * @return the number of days/months/years between the two dates
+     */
+    public static long period(String unit, java.sql.Date date1, java.sql.Date date2) {
+        return java.time.temporal.ChronoUnit.valueOf(unit).between(date1.toLocalDate(), date2.toLocalDate());
+    }
 }

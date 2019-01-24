@@ -283,7 +283,7 @@ public class MemberControllerTests {
                 .id(member.getId())
                 .forename("Maxima")
                 .surname("Musterfrau")
-                .gender(Gender.APACHE_COMBAT_HELICOPTER)
+                .gender(Gender.MALE)
                 .street("Musterstraße 2")
                 .postcode("26620")
                 .city("Updated City")
