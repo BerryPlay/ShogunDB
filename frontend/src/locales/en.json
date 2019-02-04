@@ -8,10 +8,29 @@
   "nameRequired": "Name is required",
   "required": "required",
   "menu": {
-    "addNew": "Add new",
-    "showAll": "Show all",
-    "search": "Search"
+    "home": "Home",
+    "add": "Add new",
+    "search": "Search",
+    "show": {
+      "all": "Show all",
+      "single": "Show"
+    },
+    "manage": {
+      "member": "Member",
+      "seminars": "Seminars",
+      "events": "Events",
+      "disciplines": "Disciplines",
+      "contributionClasses": "Contribution classes"
+    },
+    "switch": {
+      "dark": "Switch to dark mode",
+      "light": "Switch to light mode",
+      "en": "Switch to english",
+      "de": "Switch to german"
+    },
+    "logout": "Logout"
   },
+  "footer": "Visit ShogunDB on Github",
   "messages": {
     "errorDefault": "Something went wrong"
   },

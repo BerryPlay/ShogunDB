@@ -8,10 +8,29 @@
   "nameRequired": "Name ist erforderlich",
   "required": "erforderlich",
   "menu": {
-    "addNew": "Hinzufügen",
-    "showAll": "Alle anzeigen",
-    "search": "Suchen"
+    "home": "Startseite",
+    "add": "Hinzufügen",
+    "search": "Suchen",
+    "show": {
+      "all": "Alle anzeigen",
+      "single": "Anzeigen"
+    },
+    "manage": {
+      "member": "Mitglieder",
+      "seminars": "Lehrgänge",
+      "events": "Events",
+      "disciplines": "Disziplinen",
+      "contributionClasses": "Beitragsklassen"
+    },
+    "switch": {
+      "dark": "Zum dunklen Modus wechseln",
+      "light": "Zum hellen Modus wechseln",
+      "en": "Auf Englisch umstellen",
+      "de": "Auf Deutsch umstellen"
+    },
+    "logout": "Ausloggen"
   },
+  "footer": "ShogunDB auf Github besuchen",
   "messages": {
     "errorDefault": "Etwas ist schiefgelaufen"
   },

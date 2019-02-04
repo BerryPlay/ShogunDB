@@ -1,10 +1,12 @@
 <template>
-  <v-app>
+  <v-app :dark="dark">
     <!-- side menu -->
     <side-menu :clipped="clipped"
                :drawer="drawer"
                :show-logout="showLogout === 'true'"
                @logout="logout"
+               @dark="dark = !dark"
+               :dark="dark"
     ></side-menu>
 
     <!-- navbar -->
@@ -21,7 +23,7 @@
         <router-view @login="login" @message="showSnackbar"/>
       </v-container>
     </v-content>
-    <application-footer></application-footer>
+    <application-footer :dark="dark"></application-footer>
 
     <!-- snackbar -->
     <v-snackbar v-model="snackbar.show"
@@ -43,11 +45,11 @@
 </template>
 
 <script>
-  import ApplicationFooter from './components/ApplicationFooter.vue';
-  import Navbar from './components/Navbar.vue';
-  import SideMenu from './components/SideMenu.vue';
+import ApplicationFooter from './components/ApplicationFooter.vue';
+import Navbar from './components/Navbar.vue';
+import SideMenu from './components/SideMenu.vue';
 
-  export default {
+export default {
   name: 'App',
   components: {
     ApplicationFooter,
@@ -56,6 +58,7 @@
   },
   data() {
     return {
+      dark: false,
       clipped: false,
       drawer: true,
       fixed: false,

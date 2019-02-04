@@ -1,21 +1,20 @@
 <template>
-  <v-footer
-    app
-    fixed
-    height="auto"
-    inset
+  <v-footer app
+            fixed
+            height="auto"
+            inset
   >
-    <v-card
-      class="flex"
-      flat
-      tile
+    <v-card class="flex"
+            flat
+            tile
     >
       <v-card-actions class="justify-center">
         <strong>
-          Visit ShogunDB <img alt="" class="icon" src="../assets/logo.svg"> on
           <a href="https://github.com/BerryPlay/ShogunDB" target="_blank">
-            Github
-            <v-icon class="black--text">fab fa-github</v-icon>
+            <v-chip>
+              {{$t('footer')}}
+              <v-icon right>fab fa-github</v-icon>
+            </v-chip>
           </a>
         </strong>
         <v-icon></v-icon>
@@ -27,6 +26,9 @@
 <script>
 export default {
   name: 'ApplicationFooter',
+  props: {
+    dark: Boolean,
+  },
 };
 </script>
 

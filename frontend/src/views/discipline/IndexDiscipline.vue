@@ -15,7 +15,7 @@
                        avatar
           >
             <v-list-tile-avatar>
-              <v-icon>fas fa-running</v-icon>
+              <v-icon>fas fa-dumbbell</v-icon>
             </v-list-tile-avatar>
             <v-list-tile-content>
               <v-list-tile-title v-html="discipline.name"></v-list-tile-title>
