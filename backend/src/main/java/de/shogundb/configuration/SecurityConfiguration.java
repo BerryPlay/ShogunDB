@@ -45,6 +45,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/img/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/fonts/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/favicon.ico").permitAll()
+                .antMatchers(HttpMethod.GET, "/favicon.svg").permitAll()
 
                 // permit the authentication routes
                 .antMatchers(HttpMethod.POST, "/token").permitAll()
