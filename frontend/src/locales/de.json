@@ -16,6 +16,7 @@
       "single": "Anzeigen"
     },
     "manage": {
+      "label": "Verwalten",
       "member": "Mitglieder",
       "seminars": "Lehrgänge",
       "events": "Events",

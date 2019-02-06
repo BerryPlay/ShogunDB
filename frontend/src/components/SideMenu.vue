@@ -21,7 +21,7 @@
                     value="true"
       >
         <v-list-tile slot="activator">
-          <v-list-tile-title>Manage</v-list-tile-title>
+          <v-list-tile-title>{{$t('menu.manage.label')}}</v-list-tile-title>
         </v-list-tile>
 
         <!-- iterator over every subgroup of the manage group -->

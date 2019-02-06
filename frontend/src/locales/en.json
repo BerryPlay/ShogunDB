@@ -16,6 +16,7 @@
       "single": "Show"
     },
     "manage": {
+      "label": "Manage",
       "member": "Member",
       "seminars": "Seminars",
       "events": "Events",
