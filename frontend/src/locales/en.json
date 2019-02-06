@@ -52,7 +52,7 @@
     },
     "name": {
       "label": "Name",
-      "hint": "*erforderlich",
+      "hint": "*required",
       "required": "Name is required",
       "length": "Name must have less than 200 character"
     },
