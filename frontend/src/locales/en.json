@@ -105,11 +105,116 @@
     },
     "member": {
       "title": "Members of the discipline",
-      "id":"No.",
+      "id": "No.",
       "forename": "Forename",
       "surname": "Surname",
       "age": "Age",
       "search": "Search member"
+    }
+  },
+  "member": {
+    "add": {
+      "title": "Add new member",
+      "success": "New Member was added successfully",
+      "generalInformation": {
+        "title": "General Information",
+        "forename": {
+          "label": "Forename",
+          "hint": "*required",
+          "required": "Forename is required",
+          "length": "Forename must have 200 characters or less"
+        },
+        "surname": {
+          "label": "Surname",
+          "hint": "*required",
+          "required": "Surname is required",
+          "length": "Surname must have 200 characters or less"
+        },
+        "gender": {
+          "label": "Gender",
+          "male": "male",
+          "female": "female",
+          "diverse": "diverse",
+          "required": "Gender is required"
+        },
+        "dateOfBirth": {
+          "label": "Date of Birth",
+          "hint": "*required",
+          "required": "Date of birth is required",
+          "format": "Incorrect date format"
+        }
+      },
+      "contactInformation": {
+        "title": "Contact Information",
+        "street": {
+          "label": "Street",
+          "hint": "*required",
+          "required": "Street is required",
+          "length": "Street must have 200 characters or less"
+        },
+        "postcode": {
+          "label": "Postcode",
+          "hint": "*required",
+          "required": "Postcode is required",
+          "length": "Postcode must have between 3 and 8 digits"
+        },
+        "city": {
+          "label": "City",
+          "hint": "*required",
+          "required": "City is required",
+          "length": "City must have 200 characters or less"
+        },
+        "phoneNumber": {
+          "label": "Phone number",
+          "hint": "*required",
+          "required": "Phone number is required",
+          "length": "Phone number must have between 4 and 200 digits"
+        },
+        "mobileNumber": {
+          "label": "Mobile number",
+          "length": "Mobile number must have between 4 and 200 digits"
+        },
+        "email": {
+          "label": "E-Mail address",
+          "hint": "*required",
+          "required": "E-Mail address is required",
+          "length": "E-Mail address must have between 4 and 200 characters",
+          "valid": "Must be a valid e-mail address"
+        }
+      },
+      "membershipInformation": {
+        "title": "Membership",
+        "enteredDate": {
+          "label": "Entered date",
+          "hint": "*required",
+          "required": "Entered date is required",
+          "format": "Incorrect date format"
+        },
+        "hasBudoPass": {
+          "label": "Budo pass"
+        },
+        "budoPassDate": {
+          "label": "Budo pass date",
+          "format": "Incorrect date format"
+        }
+      },
+      "moreInformation": {
+        "title": "More",
+        "disciplines": {
+          "label": "Disciplines",
+          "required": "Disciplines is required"
+        },
+        "contributionClass": {
+          "label": "Contribution class",
+          "required": "Contribution class is required"
+        },
+        "accountHolder": {
+          "label": "Account holder",
+          "hint": "*required",
+          "required": "Account holder is required",
+          "length": "Account holder must have 200 characters or less"
+        }
+      }
     }
   }
 }

@@ -112,5 +112,110 @@
       "age": "Alter",
       "search": "Mitglied suchen"
     }
+  },
+  "member": {
+    "add": {
+      "title": "Neues Mitglied hinzufügen",
+      "success": "Neues Mitglied wurde erfolgreich hinzugefügt",
+      "generalInformation": {
+        "title": "Allgemeine Informationen",
+        "forename": {
+          "label": "Vorname",
+          "hint": "*erforderlich",
+          "required": "Vorname ist erforderlich",
+          "length": "Vorname muss 200 Zeichen oder weniger haben"
+        },
+        "surname": {
+          "label": "Nachname",
+          "hint": "*erforderlich",
+          "required": "Nachname ist erforderlich",
+          "length": "Nachname muss 200 Zeichen oder weniger haben"
+        },
+        "gender": {
+          "label": "Geschlecht",
+          "male": "männlich",
+          "female": "weiblich",
+          "diverse": "divers",
+          "required": "Geschlecht ist erforderlich"
+        },
+        "dateOfBirth": {
+          "label": "Geburtsdatum",
+          "hint": "*erforderlich",
+          "required": "Geburtsdatum ist erforderlich",
+          "format": "Falsches Datumsformat"
+        }
+      },
+      "contactInformation": {
+        "title": "Kontaktinformationen",
+        "street": {
+          "label": "Straße und Hausnummer",
+          "hint": "*erforderlich",
+          "required": "Straße und Hausnummer sind erforderlich",
+          "length": "Straße und Hausnummer müssen 200 Zeichen oder weniger haben"
+        },
+        "postcode": {
+          "label": "Postleitzahl",
+          "hint": "*erforderlich",
+          "required": "Postleitzahl ist erforderlich",
+          "length": "Postleitzahl muss zwischen 3 und 8 Ziffern haben"
+        },
+        "city": {
+          "label": "Stadt",
+          "hint": "*erforderlich",
+          "required": "Stadt ist erforderlich",
+          "length": "Stadt muss 200 Zeichen oder weniger haben"
+        },
+        "phoneNumber": {
+          "label": "Telefonnummer",
+          "hint": "*erforderlich",
+          "required": "Telefonnummer ist erforderlich",
+          "length": "Telefonnummer muss zwischen 4 und 200 Ziffern haben"
+        },
+        "mobileNumber": {
+          "label": "Handynummer",
+          "length": "Handynummer muss zwischen 4 und 200 Ziffern haben"
+        },
+        "email": {
+          "label": "E-Mail Adresse",
+          "hint": "*erforderlich",
+          "required": "E-Mail Adresse ist erforderlich",
+          "length": "E-Mail Adresse muss zwischen 4 und 200 Zeichen haben",
+          "valid": "Muss eine gütlige E-Mail Adresse sein"
+        }
+      },
+      "membershipInformation": {
+        "title": "Mitgliedschaft",
+        "enteredDate": {
+          "label": "Eintrittsdatum",
+          "hint": "*erforderlich",
+          "required": "Eintrittsdatum ist erforderlich",
+          "format": "Falsches Datumsformat"
+        },
+        "hasBudoPass": {
+          "label": "Budo Pass"
+        },
+        "budoPassDate": {
+          "label": "Budo Pass Ausstellungsdatum",
+          "format": "Falsches Datumsformat"
+        }
+      },
+      "moreInformation": {
+        "title": "Weiteres",
+        "disciplines": {
+          "label": "Disziplinen",
+          "required": "Disziplinen sind erforderlich"
+        },
+        "contributionClass": {
+          "label": "Beitragsklasse",
+          "required": "Beitragsklasse ist erforderlich"
+        },
+        "accountHolder": {
+          "label": "Kontoinhaber",
+          "hint": "*erforderlich",
+          "required": "Kontoinhaber ist erforderlich",
+          "length": "Kontoinhaber muss 200 Zeichen oder weniger haben"
+        }
+      }
+    }
   }
 }

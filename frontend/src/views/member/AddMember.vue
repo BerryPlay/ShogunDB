@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Add new member</h1>
+    <h1>{{$t('member.add.title')}}</h1>
 
     <v-form lazy-validation
             ref="form"
@@ -122,204 +122,208 @@ export default {
         valid: true,
         cards: {
           generalInformation: {
-            title: 'General Information',
+            title: this.$t('member.add.generalInformation.title'),
             inputs: {
               forename: {
-                label: 'Forename',
+                label: this.$t('member.add.generalInformation.forename.label'),
                 type: 'text',
                 value: '',
                 counter: 200,
-                hint: '*required',
+                hint: this.$t('member.add.generalInformation.forename.hint'),
                 rules: [
-                  v => !!v || 'Forename is required',
+                  v => !!v || this.$t('member.add.generalInformation.forename.required'),
                   v => (v.length >= 1 && v.length <= 200)
-                    || 'Forename must have less than 200 character',
+                    || this.$t('member.add.generalInformation.forename.length'),
                 ],
               },
               surname: {
-                label: 'Surname',
+                label: this.$t('member.add.generalInformation.surname.label'),
                 type: 'text',
                 value: '',
                 counter: 200,
-                hint: '*required',
+                hint: this.$t('member.add.generalInformation.surname.hint'),
                 rules: [
-                  v => !!v || 'Surname is required',
+                  v => !!v || this.$t('member.add.generalInformation.surname.required'),
                   v => (v.length >= 1 && v.length < 200)
-                    || 'Surname must have less than 200 character',
+                    || this.$t('member.add.generalInformation.surname.length'),
                 ],
               },
               gender: {
-                label: 'Gender',
+                label: this.$t('member.add.generalInformation.gender.label'),
                 type: 'select',
                 value: '',
                 items: [
                   {
                     value: 'MALE',
-                    text: 'male',
+                    text: this.$t('member.add.generalInformation.gender.male'),
                   },
                   {
                     value: 'FEMALE',
-                    text: 'female',
+                    text: this.$t('member.add.generalInformation.gender.female'),
+                  },
+                  {
+                    value: 'DIVERSE',
+                    text: this.$t('member.add.generalInformation.gender.diverse'),
                   },
                 ],
                 rules: [
-                  v => !!v || 'Gender is required',
+                  v => !!v || this.$t('member.add.generalInformation.gender.required'),
                 ],
               },
               dateOfBirth: {
-                label: 'Date of Birth',
+                label: this.$t('member.add.generalInformation.dateOfBirth.label'),
                 type: 'date',
                 value: '',
-                counter: 200,
                 maxDate: new Date().toISOString()
                   .substr(0, 10),
-                hint: '*required',
+                hint: this.$t('member.add.generalInformation.dateOfBirth.hint'),
                 rules: [
-                  v => !!v || 'Date of birth is required',
+                  v => !!v || this.$t('member.add.generalInformation.dateOfBirth.required'),
                   v => (v.substring(2, 3) === '.' && v.substring(5, 6) === '.')
-                    || 'Incorrect date format',
+                    || this.$t('member.add.generalInformation.dateOfBirth.format'),
                 ],
               },
             },
           },
           contactInformation: {
-            title: 'Contact',
+            title: this.$t('member.add.contactInformation.title'),
             inputs: {
               street: {
-                label: 'Street',
+                label: this.$t('member.add.contactInformation.street.label'),
                 type: 'text',
                 value: '',
                 counter: 200,
-                hint: '*required',
+                hint: this.$t('member.add.contactInformation.street.hint'),
                 rules: [
-                  v => !!v || 'Street is required',
+                  v => !!v || this.$t('member.add.contactInformation.street.required'),
                   v => (v.length >= 1 && v.length <= 200)
-                    || 'Street must have less than 200 character',
+                    || this.$t('member.add.contactInformation.street.length'),
                 ],
               },
               postcode: {
-                label: 'Postcode',
+                label: this.$t('member.add.contactInformation.postcode.label'),
                 type: 'number',
                 value: '',
-                hint: '*required',
+                hint: this.$t('member.add.contactInformation.postcode.hint'),
                 rules: [
-                  v => !!v || 'Postcode is required',
+                  v => !!v || this.$t('member.add.contactInformation.postcode.required'),
                   v => (v.length >= 3 && v.length <= 8)
-                    || 'Postcode must have between 3 and 8 digits',
+                    || this.$t('member.add.contactInformation.postcode.length'),
                 ],
               },
               city: {
-                label: 'City',
+                label: this.$t('member.add.contactInformation.city.label'),
                 type: 'text',
                 value: '',
                 counter: 200,
-                hint: '*required',
+                hint: this.$t('member.add.contactInformation.city.hint'),
                 rules: [
-                  v => !!v || 'City is required',
+                  v => !!v || this.$t('member.add.contactInformation.city.required'),
                   v => (v.length >= 1 && v.length <= 200)
-                    || 'City must have less than 200 character',
+                    || this.$t('member.add.contactInformation.city.length'),
                 ],
               },
               phoneNumber: {
-                label: 'Phone number',
+                label: this.$t('member.add.contactInformation.phoneNumber.label'),
                 type: 'text',
                 value: '',
                 counter: 200,
-                hint: '*required',
+                hint: this.$t('member.add.contactInformation.phoneNumber.hint'),
                 rules: [
-                  v => !!v || ' is required',
-                  v => (v.length >= 4 && v.length <= 200) || 'Phone number must have between 3 '
-                    + 'and 8 digits',
+                  v => !!v || this.$t('member.add.contactInformation.phoneNumber.required'),
+                  v => (v.length >= 4 && v.length <= 200)
+                    || this.$t('member.add.contactInformation.phoneNumber.length'),
                 ],
               },
               mobileNumber: {
-                label: 'Mobile number',
+                label: this.$t('member.add.contactInformation.mobileNumber.label'),
                 type: 'text',
                 value: '',
                 counter: 200,
                 rules: [
                   v => (v.length === 0 || (v.length >= 4 && v.length <= 200))
-                    || 'Mobile number must have between 3 and 8 digits',
+                    || this.$t('member.add.contactInformation.mobileNumber.length'),
                 ],
               },
               email: {
-                label: 'E-Mail address',
+                label: this.$t('member.add.contactInformation.email.label'),
                 type: 'text',
                 value: '',
                 counter: 200,
-                hint: '*required',
+                hint: this.$t('member.add.contactInformation.email.hint'),
                 rules: [
-                  v => !!v || 'E-Mail address is required',
-                  v => (v.length >= 4 && v.length <= 200) || 'E-Mail address must have between '
-                    + '3 and 8 digits',
-                  v => this.emailRegEx.test(v) || 'Must be a valid e-mail address',
+                  v => !!v || this.$t('member.add.contactInformation.email.required'),
+                  v => (v.length >= 4 && v.length <= 200)
+                    || this.$t('member.add.contactInformation.email.length'),
+                  v => this.emailRegEx.test(v)
+                    || this.$t('member.add.contactInformation.email.valid'),
                 ],
               },
             },
           },
           membershipInformation: {
-            title: 'Membership',
+            title: this.$t('member.add.membershipInformation.title'),
             inputs: {
               enteredDate: {
-                label: 'Entered date',
+                label: this.$t('member.add.membershipInformation.enteredDate.label'),
                 type: 'date',
                 value: '',
-                hint: '*required',
+                hint: this.$t('member.add.membershipInformation.enteredDate.hint'),
                 rules: [
-                  v => !!v || 'Entered date is required',
+                  v => !!v || this.$t('member.add.membershipInformation.enteredDate.required'),
                   v => (v.substring(2, 3) === '.' && v.substring(5, 6) === '.')
-                    || 'Incorrect date format',
+                    || this.$t('member.add.membershipInformation.enteredDate.format'),
                 ],
               },
               hasBudoPass: {
-                label: 'Budo pass',
+                label: this.$t('member.add.membershipInformation.hasBudoPass.label'),
                 type: 'checkbox',
                 value: '',
               },
               budoPassDate: {
-                label: 'Budo pass date',
+                label: this.$t('member.add.membershipInformation.budoPassDate.label'),
                 type: 'date',
                 value: '',
-                hint: '*required',
                 rules: [
-                  v => (v.substring(2, 3) === '.' && v.substring(5, 6) === '.')
-                    || 'Incorrect date format',
+                  v => (v.length === 0)
+                    || ((v.substring(2, 3) === '.' && v.substring(5, 6) === '.'))
+                    || this.$t('member.add.membershipInformation.budoPassDate.format'),
                 ],
               },
             },
           },
           moreInformation: {
-            title: 'More',
+            title: this.$t('member.add.moreInformation.title'),
             inputs: {
               disciplines: {
-                label: 'Disciplines',
+                label: this.$t('member.add.moreInformation.disciplines.label'),
                 type: 'select',
                 multi: true,
                 value: '',
                 items: [],
                 rules: [
-                  v => !!v || 'Contribution class is required',
+                  v => !!v || this.$t('member.add.moreInformation.disciplines.required'),
                 ],
               },
               contributionClass: {
-                label: 'Contribution class',
+                label: this.$t('member.add.moreInformation.contributionClass.label'),
                 type: 'select',
                 value: '',
                 items: [],
                 rules: [
-                  v => !!v || 'Contribution class is required',
+                  v => !!v || this.$t('member.add.moreInformation.contributionClass.required'),
                 ],
               },
               accountHolder: {
-                label: 'Account holder',
+                label: this.$t('member.add.moreInformation.accountHolder.label'),
                 type: 'text',
                 value: '',
                 counter: 200,
-                hint: '*required',
+                hint: this.$t('member.add.moreInformation.accountHolder.hint'),
                 rules: [
-                  v => !!v || 'Account holder is required',
+                  v => !!v || this.$t('member.add.moreInformation.accountHolder.required'),
                   v => (v.length >= 1 && v.length < 200)
-                    || 'Account holder must have less than 200 character',
+                    || this.$t('member.add.moreInformation.accountHolder.length'),
                 ],
               },
             },
@@ -341,7 +345,7 @@ export default {
           });
         });
       })
-      .catch(() => this.$emit('message', 'Something went wrong.', 'error'));
+      .catch(() => this.$emit('message', this.$t('messages.errorDefault'), 'error'));
 
     // fetch the disciplines
     this.$axios.get('/discipline')
@@ -353,7 +357,7 @@ export default {
           });
         });
       })
-      .catch(() => this.$emit('message', 'Something went wrong.', 'error'));
+      .catch(() => this.$emit('message', this.$t('messages.errorDefault'), 'error'));
   },
   methods: {
     /**
@@ -363,10 +367,10 @@ export default {
       if (this.$refs.form.validate()) {
         this.$axios.post('/member', this.member)
           .then(() => {
-            this.$emit('message', 'Member created successfully.', 'success');
+            this.$emit('message', this.$t('member.add.success'), 'success');
           })
           .catch(() => {
-            this.$emit('message', 'Something went wrong.', 'error');
+            this.$emit('message', this.$t('messages.errorDefault'), 'error');
           })
           .finally(() => {
             this.loading = false;
