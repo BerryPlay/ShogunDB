@@ -114,6 +114,8 @@
 </template>
 
 <script>
+import formatDate from '../../helper';
+
 export default {
   name: 'AddMember',
   data() {
@@ -360,6 +362,7 @@ export default {
       .catch(() => this.$emit('message', this.$t('messages.errorDefault'), 'error'));
   },
   methods: {
+    formatDate,
     /**
      * Validates all inputs and submits the form
      */
@@ -376,22 +379,6 @@ export default {
             this.loading = false;
           });
       }
-    },
-    /**
-     * Converts a `YYYY-MM-DD` date format to `DD.MM.YYYY`.
-     *
-     * @param {string} date the date to convert
-     * @returns {string} the converted date
-     */
-    formatDate(date) {
-      if (date.length === 10) {
-        const year = date.substring(0, 4);
-        const month = date.substring(5, 7);
-        const day = date.substring(8, 10);
-
-        return `${day}.${month}.${year}`;
-      }
-      return '';
     },
   },
   computed: {

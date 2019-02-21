@@ -62,6 +62,13 @@ export default new Router({
       component: () => import('./views/discipline/ShowDiscipline.vue'),
     },
 
+    // event routes
+    {
+      path: '/event/add',
+      name: 'addEvent',
+      component: () => import('./views/event/AddEvent.vue'),
+    },
+
     // member routes
     {
       path: '/member/add',

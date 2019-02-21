@@ -113,6 +113,33 @@
       "search": "Mitglied suchen"
     }
   },
+  "event": {
+    "singular": "Event",
+    "plural": "Events",
+    "add": {
+      "title": "Neues Event hinzufügen",
+      "success": "Neues Event wurde erfolgreich hinzugefügt",
+      "information": "Informationen",
+      "name": {
+        "label": "Name des Events",
+        "hint": "*erforderlich",
+        "required": "Name des Events ist erforderlich",
+        "length": "Name des Events muss 200 Zeichen oder weniger haben"
+      },
+      "date": {
+        "label": "Datum des Events",
+        "hint": "*erforderlich",
+        "required": "Datum des Events ist erforderlich",
+        "format": "Falsches Datumsformat"
+      },
+      "member": {
+        "title": "Teilnehmer",
+        "forename": "Vorname",
+        "surname": "Nachname",
+        "age": "Alter"
+      }
+    }
+  },
   "member": {
     "add": {
       "title": "Neues Mitglied hinzufügen",

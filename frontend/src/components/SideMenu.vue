@@ -147,7 +147,9 @@ export default {
             {
               label: this.$t('menu.add'),
               icon: 'fas fa-plus',
-              route: 'Route',
+              route: {
+                name: 'addEvent',
+              },
             },
             {
               label: this.$t('menu.search'),

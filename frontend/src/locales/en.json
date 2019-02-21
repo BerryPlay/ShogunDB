@@ -112,6 +112,33 @@
       "search": "Search member"
     }
   },
+  "event": {
+    "singular": "Event",
+    "plural": "Events",
+    "add": {
+      "title": "Add new event",
+      "success": "New event was added successfully",
+      "information": "Information",
+      "name": {
+        "label": "Name of the events",
+        "hint": "*required",
+        "required": "Name of the Events is required",
+        "length": "Name of the event must have less than 200 character"
+      },
+      "date": {
+        "label": "Date of the event",
+        "hint": "*required",
+        "required": "Date of the event is required",
+        "format": "Wrong date format"
+      },
+      "member": {
+        "title": "Member",
+        "forename": "Forename",
+        "surname": "Surname",
+        "age": "Age"
+      }
+    }
+  },
   "member": {
     "add": {
       "title": "Add new member",
