@@ -77,14 +77,14 @@
                   </td>
                 </template>
               </v-data-table>
-              <v-btn
-                color="green"
-                dark
-                small
-                absolute
-                bottom
-                left
-                fab
+              <v-btn color="green"
+                     @click="openMemberAddModal"
+                     dark
+                     small
+                     absolute
+                     bottom
+                     left
+                     fab
               >
                 <v-icon>add</v-icon>
               </v-btn>
@@ -93,6 +93,12 @@
           </v-card>
         </v-flex>
       </v-layout>
+
+      <!-- a modal to add members to the data table -->
+      <member-add-modal :show="showMemberAddModal"
+                        @closeModal="closeMemberAddModal"
+                        @submitMember="addMember"/>
+
       <v-btn @click="submit"
              bottom
              :color="color"
@@ -108,13 +114,18 @@
 </template>
 
 <script>
-import formatDate from '../../helper';
+import MemberAddModal from '../../components/MemberAddModal.vue';
+import { formatDate } from '../../helper';
 
 export default {
   name: 'AddEvent',
+  components: {
+    MemberAddModal,
+  },
   data() {
     return {
       color: 'purple darken-3',
+      showMemberAddModal: false,
       event: {
         name: {
           label: this.$t('event.add.name.label'),
@@ -161,20 +172,7 @@ export default {
               width: '1rem',
             },
           ],
-          items: [
-            {
-              id: 1,
-              forename: 'Max',
-              surname: 'Mustermann',
-              age: 14,
-            },
-            {
-              id: 2,
-              forename: 'Maxima',
-              surname: 'Musterfrau',
-              age: 14,
-            },
-          ],
+          items: [],
         },
       },
     };
@@ -193,6 +191,38 @@ export default {
       const index = this.event.member.items.indexOf(member);
 
       this.event.member.items.splice(index, 1);
+    },
+    /**
+     * Opens the member add modal to add a member to the list.
+     */
+    openMemberAddModal() {
+      this.$set(this, 'showMemberAddModal', true);
+    },
+    /**
+     * Closes the member add modal.
+     */
+    closeMemberAddModal() {
+      this.$set(this, 'showMemberAddModal', false);
+    },
+    /**
+     * Adds the given member to the list of members, if not already done.
+     *
+     * @param member the member to add to the list
+     */
+    addMember(member) {
+      let alreadyAdded = false;
+
+      // check, if the member is already part of the list
+      this.event.member.items.forEach((item) => {
+        if (item.id === member.id) {
+          alreadyAdded = true;
+        }
+      });
+
+      // add the member to the list of members
+      if (!alreadyAdded) {
+        this.event.member.items.push(member);
+      }
     },
   },
 };

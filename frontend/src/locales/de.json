@@ -1,7 +1,8 @@
 {
   "phrases": {
     "yes": "Ja",
-    "no": "Nein"
+    "no": "Nein",
+    "close": "Schließen"
   },
   "message": "Deutsch",
   "name": "Name",
@@ -34,6 +35,14 @@
   "footer": "ShogunDB auf Github besuchen",
   "messages": {
     "errorDefault": "Etwas ist schiefgelaufen"
+  },
+  "components": {
+    "memberAddModal": {
+      "search": {
+        "title": "Mitglied suchen",
+        "input": "Name des Mitglieds"
+      }
+    }
   },
   "table": {
     "empty": "Keine Daten vorhanden",

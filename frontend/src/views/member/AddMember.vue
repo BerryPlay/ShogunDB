@@ -114,7 +114,7 @@
 </template>
 
 <script>
-import formatDate from '../../helper';
+import { formatDate } from '../../helper';
 
 export default {
   name: 'AddMember',

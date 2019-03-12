@@ -1,7 +1,8 @@
 {
   "phrases": {
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "close": "Close"
   },
   "message": "English",
   "name": "Name",
@@ -34,6 +35,14 @@
   "footer": "Visit ShogunDB on Github",
   "messages": {
     "errorDefault": "Something went wrong"
+  },
+  "components": {
+    "memberAddModal": {
+      "search": {
+        "title": "Search member",
+        "input": "Name of the member"
+      }
+    }
   },
   "table": {
     "empty": "No data available",
