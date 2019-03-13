@@ -20,6 +20,9 @@ public interface MemberRepository extends PagingAndSortingRepository<Member, Lon
 
     List<Member> findByContributionClass(ContributionClass contributionClass);
 
-    @Query(value = "SELECT * FROM member m WHERE CONCAT(m.forename, ' ', m.surname) LIKE concat('%', :name, '%')", nativeQuery = true)
+    @Query(
+            value = "SELECT * FROM member m WHERE CONCAT(LOWER(m.forename), ' ', LOWER(m.surname)) " +
+                    "LIKE concat('%', LOWER(:name), '%')",
+            nativeQuery = true)
     List<Member> findByFullname(@Param("name") String name);
 }
