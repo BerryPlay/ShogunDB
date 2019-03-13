@@ -179,8 +179,33 @@ export default {
   },
   methods: {
     formatDate,
+    /**
+     * Validates the form and performs a post request to the backend to store the new event.
+     */
     submit() {
-      // todo: implement this
+      if (this.$refs.form.validate()) {
+        // get the ids of all members
+        const members = [];
+        this.event.member.items.forEach((member) => {
+          members.push(member.id);
+        });
+
+        // post request to the event route
+        this.$axios.post('/event', {
+          name: this.event.name.value,
+          date: this.event.date.value,
+          members,
+        })
+          .then(() => {
+            this.$emit('message', this.$t('event.add.success'), 'success');
+          })
+          .catch(() => {
+            this.$emit('message', this.$t('messages.errorDefault'), 'error');
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+      }
     },
     /**
      * Removes the member with the given id from the list of members.
