@@ -166,6 +166,16 @@ public class UserController {
     }
 
     /**
+     * An endpoint to check, if the database has at least one user.
+     *
+     * @return a HTTP 200 OK if at least one user exists in the database, else a HTTP 204 NO CONTENT
+     */
+    @RequestMapping(value = "/exists", method = RequestMethod.HEAD)
+    ResponseEntity<?> checkIfAUserExists() {
+        return userRepository.count() > 0 ? ResponseEntity.ok().build() : ResponseEntity.noContent().build();
+    }
+
+    /**
      * Returns the id of the current authenticated user.
      *
      * @param request a servlet request object to get the current authenticated user

@@ -223,5 +223,23 @@ public class UserControllerTests {
 
         assertFalse(this.userRepository.findById(user.getId()).isPresent());
     }
+
+    @Test
+    public void user_existence_can_be_checked() throws Exception {
+        // check with no existing user
+        mockMvc.perform(head("/user/exists"))
+                .andExpect(status().isNoContent());
+
+        // add a user to the database
+        userRepository.save(User.builder()
+                .username("test_user")
+                .password("super_secure_password")
+                .email("email@internet.de")
+                .build());
+
+        // check with existing user
+        mockMvc.perform(head("/user/exists"))
+                .andExpect(status().isOk());
+    }
 }
 

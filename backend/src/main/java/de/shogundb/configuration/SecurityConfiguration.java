@@ -51,6 +51,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/token").permitAll()
                 .antMatchers(HttpMethod.HEAD, "/token/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/user").permitAll()
+
+                // permit the initial setup routes
+                .antMatchers(HttpMethod.HEAD, "/user/exists").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
