@@ -176,6 +176,24 @@ public class UserController {
     }
 
     /**
+     * Adds the given user to the database, if no user user exists.
+     *
+     * @param user a user data transfer object with all necessary information
+     * @return a HTTP 201 CREATED and the new user, if the user was created successfully, or a HTTP 409 CONFLICT if
+     * other users exists in the database
+     */
+    @PostMapping("/exists")
+    ResponseEntity<User> storeFirstUser(@RequestBody @Valid UserRegister user) {
+        // check, if no other user exists
+        if (userRepository.count() != 0) {
+            return ResponseEntity.status(409).build();
+        }
+
+        // create a new user
+        return store(user);
+    }
+
+    /**
      * Returns the id of the current authenticated user.
      *
      * @param request a servlet request object to get the current authenticated user

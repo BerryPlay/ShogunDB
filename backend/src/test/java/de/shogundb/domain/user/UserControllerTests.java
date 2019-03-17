@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -26,6 +25,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -65,7 +65,7 @@ public class UserControllerTests {
 
         this.mockMvc.perform(get("/user"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(user.getId().intValue())))
                 .andExpect(jsonPath("$[0].username", is(user.getUsername())))
@@ -82,7 +82,7 @@ public class UserControllerTests {
 
         mockMvc.perform(get("/user"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[1].id", is(user2.getId().intValue())))
                 .andExpect(jsonPath("$[1].username", is(user2.getUsername())))
@@ -143,7 +143,7 @@ public class UserControllerTests {
 
         mockMvc.perform(
                 post("/user")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON_UTF8)
                         .content(userJsonString))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username", is(user.getUsername())))
@@ -153,7 +153,7 @@ public class UserControllerTests {
         // test, if validation works
         user.setPassword(null);
         mockMvc.perform(post("/user")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON_UTF8)
                 .content(TestHelper.toJson(user)))
                 .andExpect(status().isBadRequest());
     }
@@ -174,7 +174,7 @@ public class UserControllerTests {
 
         mockMvc.perform(
                 put("/user")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON_UTF8)
                         .content(userJsonString))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id", is(user.getId().intValue())))
@@ -196,7 +196,7 @@ public class UserControllerTests {
         userJsonString = TestHelper.toJson(newUser);
         try {
             mockMvc.perform(put("/user")
-                    .contentType(MediaType.APPLICATION_JSON)
+                    .contentType(APPLICATION_JSON_UTF8)
                     .content(userJsonString));
             fail();
         } catch (NestedServletException e) {
@@ -240,6 +240,41 @@ public class UserControllerTests {
         // check with existing user
         mockMvc.perform(head("/user/exists"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void first_user_can_be_added() throws Exception {
+        var firstUser = UserRegister.builder()
+                .username("first_user")
+                .email("email@internet.de")
+                .password("test_password")
+                .build();
+
+        // add the first user
+        mockMvc.perform(post("/user/exists")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(TestHelper.toJson(firstUser)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.username").value("first_user"))
+                .andExpect(jsonPath("$.email").value("email@internet.de"));
+
+        // check if the user was added successfully
+        assertEquals(1, userRepository.count());
+
+        var secondUser = UserRegister.builder()
+                .username("second_user")
+                .email("email@internet.de")
+                .password("test_password")
+                .build();
+
+        // try to add another user (must fail)
+        mockMvc.perform(post("/user/exists")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content(TestHelper.toJson(secondUser)))
+                .andExpect(status().isConflict());
+
+        // check if there is still only one user in the database
+        assertEquals(1, userRepository.count());
     }
 }
 
