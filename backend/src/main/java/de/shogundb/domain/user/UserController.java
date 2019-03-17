@@ -35,30 +35,25 @@ public class UserController {
         this.tokenService = tokenService;
     }
 
-    //------------------- get all users ------------------------------------------------------------
+    /**
+     * Get a list of all users in the database.
+     *
+     * @return a HTTP 200 OK and a list of all users
+     */
     @GetMapping
-    ResponseEntity<Collection<User>> getAllUsers() {
+    ResponseEntity<Collection<User>> index() {
         return ResponseEntity.ok((Collection<User>) userRepository.findAll());
     }
 
-    //------------------- call a user by id --------------------------------------------------------
-    @GetMapping(value = "/{id}")
-    ResponseEntity<User> getUserById(@PathVariable Long id) throws UserNotFoundException {
-        return userRepository.findById(id).map(ResponseEntity::ok).orElseThrow(() -> new UserNotFoundException(id));
-    }
-
-    //------------------- check, if user exist by id -----------------------------------------------
-    @RequestMapping(value = "/{id}", method = RequestMethod.HEAD)
-    ResponseEntity<?> head(@PathVariable Long id) {
-        return userRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent()
-                        .build());
-    }
-
-    //------------------- add a new user -----------------------------------------------------------
+    /**
+     * Adds a new user to the database.
+     *
+     * @param user a user data transfer object with all necessary information
+     * @return a HTTP 201 CREATED and the new user, if the user was created successfully, or a HTTP 204 NO CONTENT, if a
+     * user with the given username already exists
+     */
     @PostMapping
-    ResponseEntity<User> addUser(@RequestBody @Valid UserRegister user) {
+    ResponseEntity<User> store(@RequestBody @Valid UserRegister user) {
         // check, if user already exists
         if (this.userRepository.findByUsername(user.getUsername()).isPresent()) {
             return ResponseEntity.noContent().build();
@@ -81,9 +76,18 @@ public class UserController {
         return ResponseEntity.created(uri).body(newUser);
     }
 
-    //------------------- update an existing user --------------------------------------------------
+    /**
+     * Updates an existing user in the database.
+     *
+     * @param user    a data transfer object with all necessary information
+     * @param request a servlet request object to check, if the current authenticated user is the same as the user to
+     *                update
+     * @return a HTTP 201 CREATED if the user was updated successfully
+     * @throws UserNotFoundException thrown, if the given user does not exist in the database
+     */
     @PutMapping
-    ResponseEntity<User> updateUser(@RequestBody @Valid UserUpdate user, HttpServletRequest request) throws UserNotFoundException {
+    ResponseEntity<User> update(@RequestBody @Valid UserUpdate user, HttpServletRequest request)
+            throws UserNotFoundException {
         Long id = user.getId();
 
         if (id.equals(this.getAuthenticatedId(request))) {
@@ -113,9 +117,17 @@ public class UserController {
         return ResponseEntity.badRequest().build();
     }
 
-    //------------------- delete an existing user --------------------------------------------------
+    /**
+     * Deletes the user with the given id and all its tokens from the database.
+     *
+     * @param id      the unique identifier of the user
+     * @param request a servlet request object to check, if the current authenticated user is the same as the user to
+     *                delete
+     * @return a HTTP 204 NO CONTENT if the user was successfully removed from the database
+     * @throws UserNotFoundException thrown, if no user with the given id exists
+     */
     @DeleteMapping(value = "/{id}")
-    ResponseEntity<?> deleteUserById(@PathVariable Long id, HttpServletRequest request) throws UserNotFoundException {
+    ResponseEntity<?> delete(@PathVariable Long id, HttpServletRequest request) throws UserNotFoundException {
         // check if the id belongs to the authenticated user
         if (id.equals(this.getAuthenticatedId(request))) {
             return userRepository.findById(id).map(
@@ -127,16 +139,45 @@ public class UserController {
         return ResponseEntity.badRequest().build();
     }
 
+    /**
+     * Returns the user with the given id (except of his password hash).
+     *
+     * @param id the unique identifier of the user
+     * @return a HTTP 200 OK and the user with the given id
+     * @throws UserNotFoundException thrown, if no user with the given id exists
+     */
+    @GetMapping(value = "/{id}")
+    ResponseEntity<User> show(@PathVariable Long id) throws UserNotFoundException {
+        return userRepository.findById(id).map(ResponseEntity::ok).orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    /**
+     * Validates, if the user with the given id exists.
+     *
+     * @param id the unique identifier of the user
+     * @return a HTTP 200 OK if the user with the given id exists, else a HTTP 204 NO CONTENT
+     */
+    @RequestMapping(value = "/{id}", method = RequestMethod.HEAD)
+    ResponseEntity<?> head(@PathVariable Long id) {
+        return userRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent()
+                        .build());
+    }
+
+    /**
+     * Returns the id of the current authenticated user.
+     *
+     * @param request a servlet request object to get the current authenticated user
+     * @return the id of the current authenticated user
+     */
     private Long getAuthenticatedId(HttpServletRequest request) {
         // get the token from the headers
         final String header = request.getHeader("Authorization");
-
         final String plaintToken = header.replace("Bearer ", "");
 
         Optional<Token> tokenOptional = this.tokenRepository.findByToken(plaintToken);
-
         Token token = tokenOptional.get();
-
         User user = token.getUser();
 
         return user.getId();
