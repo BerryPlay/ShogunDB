@@ -21,7 +21,7 @@ Vue.config.productionTip = false;
  * If the token is not valid, the route `/login` will be loaded.
  */
 router.beforeEach((to, from, next) => {
-  if (to.meta.noAuth) {
+  if (to.meta.noAuth || to.path === '/setup') {
     next();
   } else {
     Vue.axios.head(`/token/${localStorage.authenticationToken}`)

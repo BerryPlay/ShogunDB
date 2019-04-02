@@ -7,6 +7,11 @@ Vue.use(Router);
 export default new Router({
   routes: [
     {
+      path: '/setup',
+      name: 'setup',
+      component: () => import('./views/setup/InitialSetup.vue'),
+    },
+    {
       path: '/dashboard',
       name: 'dashboard',
       component: Home,

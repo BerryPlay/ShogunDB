@@ -88,6 +88,20 @@ export default {
   created() {
     // set the authenticated flag to false
     localStorage.authenticated = false;
+
+    // check if a user already exists
+    this.$axios.head('/user/exists')
+      .then((response) => {
+        if (response.status === 204) {
+          // if no user exists, push to the setup route
+          this.$router.push({
+            name: 'setup',
+          });
+        }
+      })
+      .catch(() => {
+        this.$emit('message', this.$t('messages.errorDefault'), 'error');
+      });
   },
   methods: {
     /**

@@ -36,6 +36,55 @@
   "messages": {
     "errorDefault": "Something went wrong"
   },
+  "setup": {
+    "title": "Application Setup",
+    "steps": {
+      "buttons": {
+        "continue": "Continue",
+        "back": "Back"
+      },
+      "welcome": {
+        "name": "Welcome",
+        "title": "Welcome",
+        "body": [
+          "Welcome to the ShogunDB membership management tool for schools for martial arts.",
+          "ShogunDB is a free software and gratis to use.",
+          "This is the first time you are using this application.",
+          "You have to setup a new user first."
+        ]
+      },
+      "createUser": {
+        "name": "Setup a user",
+        "title": "Setup a user",
+        "username": {
+          "label": "Username",
+          "required": "Username is required",
+          "length": "The username must have between 2 and 200 characters"
+        },
+        "email": {
+          "label": "E-Mail Address",
+          "required": "E-Mail Address is required",
+          "length": "The e-mail address must have between 2 and 200 characters",
+          "valid": "Must be a valid e-mail address"
+        },
+        "password": {
+          "label": "Password",
+          "labelRepeat": "Repeat password",
+          "required": "Password is required",
+          "requiredRepeat": "Repeated password is required",
+          "length": "The password must have between 4 and 200 characters",
+          "lengthRepeat": "The repeated password must have between 4 and 200 characters",
+          "match": "The passwords do not match"
+        },
+        "success": "The user was created successfully"
+      },
+      "finish": {
+        "name": "Finish Setup",
+        "title": "Setup finished",
+        "body": "The setup was finished successfully. You can now start using the application."
+      }
+    }
+  },
   "components": {
     "memberAddModal": {
       "search": {

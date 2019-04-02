@@ -36,6 +36,55 @@
   "messages": {
     "errorDefault": "Etwas ist schiefgelaufen"
   },
+  "setup": {
+    "title": "Einrichten der Anwendung",
+    "steps": {
+      "buttons": {
+        "continue": "Weiter",
+        "back": "Zurück"
+      },
+      "welcome": {
+        "name": "Willkommen",
+        "title": "Willkommen",
+        "body": [
+          "Willkommen in der ShogunDB Mitgliederverwaltung für Budosport Schulen.",
+          "ShogunDB ist eine freie Software und kann kostenlos genutzt werden.",
+          "Dies ist das erste Mal, dass Sie diese Anwendung benutzen. ",
+          "Zunächst ist es nötig einen Benutzer anzulegen."
+        ]
+      },
+      "createUser": {
+        "name": "Benutzer anlegen",
+        "title": "Benutzer anlegen",
+        "username": {
+          "label": "Benutzername",
+          "required": "Benutzername ist erforderlich",
+          "length": "Der Benutzername muss zwischen 2 und 200 Zeichen lang sein"
+        },
+        "email": {
+          "label": "E-Mail Adresse",
+          "required": "E-Mail Adresse ist erforderlich",
+          "length": "E-Mail Adresse muss zwischen 4 und 200 Zeichen haben",
+          "valid": "Muss eine gütlige E-Mail Adresse sein"
+        },
+        "password": {
+          "label": "Passwort",
+          "labelRepeat": "Passwort wiederholen",
+          "required": "Passwort ist erforderlich",
+          "requiredRepeat": "Wiederholtes Passwort ist erforderlich",
+          "length": "Das Passwort muss zwischen 4 und 200 Zeichen lang sein",
+          "lengthRepeat": "Das wiederholte Passwort muss zwischen 4 und 200 Zeichen lang sein",
+          "match": "Die Passwörter stimmen nicht überein"
+        },
+        "success": "Der Benutzer wurde erfolgreich erstellt"
+      },
+      "finish": {
+        "name": "Setup abschließen",
+        "title": "Setup abgeschlossen",
+        "body": "Das Setup wurde erfolgreich abgeschlossen. Sie können die Anwendung jetzt benutzen."
+      }
+    }
+  },
   "components": {
     "memberAddModal": {
       "search": {
