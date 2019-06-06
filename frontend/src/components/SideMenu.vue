@@ -154,7 +154,9 @@ export default {
             {
               label: this.$t('menu.search'),
               icon: 'fas fa-search',
-              route: 'Route',
+              route: {
+                name: 'searchEvent',
+              },
             },
           ],
         },

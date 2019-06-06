@@ -1,29 +1,12 @@
 <template>
   <div>
-    <!-- remove dialog -->
-    <v-dialog v-model="showDeleteDialog" persistent max-width="400">
-      <v-card>
-        <v-card-title>
-          <h2>{{$t('discipline.delete.title')}}</h2>
-        </v-card-title>
-
-        <v-card-text>
-          <b>{{$t('discipline.delete.warning')}}:</b>
-          {{$t('discipline.delete.body')}}
-          <div align="right">
-            <v-btn @click="showDeleteDialog = false">
-              {{$t('phrases.no')}}
-            </v-btn>
-            <v-btn color="error"
-                   dark
-                   @click="remove"
-            >
-              {{$t('phrases.yes')}}
-            </v-btn>
-          </div>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+    <delete-dialog :show="showDeleteDialog"
+                   :title="$t('discipline.delete.title')"
+                   :warning="$t('discipline.delete.warning')"
+                   :warning-content="$t('discipline.delete.body')"
+                   @yes="remove"
+                   @no="showDeleteDialog = false"
+    />
 
     <!-- content -->
     <h1>{{$t('discipline.singular')}}: {{name}}</h1>
@@ -59,49 +42,24 @@
         </v-flex>
       </v-layout>
 
-
-      <!--speed dial -->
-      <v-speed-dial v-model="openSpeedDial"
-                    bottom
-                    right
-                    fixed
-      >
-        <v-btn slot="activator"
-               v-model="fab"
-               :color="color"
-               dark
-               fab
-        >
-          <v-icon>more_vert</v-icon>
-          <v-icon>close</v-icon>
-        </v-btn>
-        <v-btn fab
-               dark
-               small
-               color="blue"
-               @click="submit"
-        >
-          <v-icon>save</v-icon>
-        </v-btn>
-        <v-btn fab
-               dark
-               small
-               color="red"
-               @click="showDeleteDialog = true"
-        >
-          <v-icon>delete</v-icon>
-        </v-btn>
-      </v-speed-dial>
+      <floating-button :color="color"
+                       @delete="showDeleteDialog = true"
+                       @save="submit"
+      />
     </v-form>
   </div>
 </template>
 
 <script>
+import DeleteDialog from '../../components/dialogs/DeleteDialog.vue';
+import FloatingButton from '../../components/FloatingButton.vue';
 import MemberDataTable from '../../components/MemberDataTable.vue';
 
 export default {
   name: 'showDiscipline',
   components: {
+    DeleteDialog,
+    FloatingButton,
     MemberDataTable,
   },
   data() {
@@ -172,7 +130,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-
-</style>

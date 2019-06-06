@@ -73,6 +73,16 @@ export default new Router({
       name: 'addEvent',
       component: () => import('./views/event/AddEvent.vue'),
     },
+    {
+      path: '/event/search',
+      name: 'searchEvent',
+      component: () => import('./views/event/SearchEvent.vue'),
+    },
+    {
+      path: '/event/show/:id',
+      name: 'showEvent',
+      component: () => import('./views/event/ShowEvent.vue'),
+    },
 
     // member routes
     {

@@ -196,6 +196,25 @@
         "surname": "Nachname",
         "age": "Alter"
       }
+    },
+    "search": {
+      "title": "Event suchen",
+      "list": "Eventliste",
+      "id": "ID",
+      "name": "Name",
+      "date": "Datum",
+      "rowsPerPageText": "Events pro Seite",
+      "noResult": "Es sind keine Events vorhanden"
+    },
+    "show": {
+      "title": "Event: {name}",
+      "label": "Name des Events",
+      "edit": "Bearbeiten",
+      "delete": {
+        "title": "Event löschen?",
+        "warning": "Achtung",
+        "warningContent": "das Event wird unwiderruflich gelöscht! Sind Sie sich sicher?"
+      }
     }
   },
   "member": {

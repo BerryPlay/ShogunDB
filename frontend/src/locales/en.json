@@ -195,6 +195,25 @@
         "surname": "Surname",
         "age": "Age"
       }
+    },
+    "search": {
+      "title": "Search event",
+      "list": "Eventlist",
+      "id": "ID",
+      "name": "Name",
+      "date": "Date",
+      "rowsPerPageText": "Events per page",
+      "noResult": "No events found"
+    },
+    "show": {
+      "title": "Event: {name}",
+      "label": "Name of the event",
+      "edit": "Edit",
+      "delete": {
+        "title": "Delete event?",
+        "warning": "Warning",
+        "warningContent": "the event will be removed from the database! Are you sure?"
+      }
     }
   },
   "member": {
