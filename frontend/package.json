@@ -10,7 +10,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
     "@fortawesome/fontawesome-free": "^5.9.0",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "roboto-fontface": "*",
     "vue": "^2.6.10",
     "vue-i18n": "^8.11.2",
